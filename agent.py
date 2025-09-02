@@ -1,4 +1,4 @@
-# agent.py - Fully Agentic Document Chat System
+# agent.py - Document Chat System
 import os
 import tempfile
 import json
@@ -63,10 +63,19 @@ def parse_document_content(file_path: str) -> str:
         return f"Error: File {file_path} not found"
     
     try:
-        converter = DocumentConverter()
-        result = converter.convert(file_path)
-        content = result.document.export_to_markdown()
+        # Handle different file types
+        file_ext = Path(file_path).suffix.lower()
         filename = Path(file_path).name
+        
+        if file_ext == '.txt':
+            # Direct text file reading
+            with open(file_path, 'r', encoding='utf-8') as f:
+                content = f.read()
+        else:
+            # Use DocumentConverter for other formats
+            converter = DocumentConverter()
+            result = converter.convert(file_path)
+            content = result.document.export_to_markdown()
         
         # Store full content and create chunks
         document_store["documents"][filename] = content
@@ -220,18 +229,6 @@ def list_available_documents() -> str:
 # 2) Agentic Workflow Agents
 # ——————————————————————————————————————————————
 
-document_processor_agent = LlmAgent(
-    name="DocumentProcessor",
-    model="gemini-2.0-flash",
-    description="Processes and analyzes uploaded documents",
-    instruction=(
-        "When given a file path, first call parse_document_content(file_path) to extract content, "
-        "then call summarize_document(filename) to create an intelligent summary. "
-        "Always process documents completely before responding."
-    ),
-    tools=[parse_document_content, summarize_document],
-    output_key="processing_result"
-)
 
 context_agent = LlmAgent(
     name="ContextAgent",
@@ -264,7 +261,7 @@ answer_agent = LlmAgent(
 # ——————————————————————————————————————————————
 
 root_agent = SequentialAgent(
-    name="AgenticDocumentAssistant",
+    name="DocumentChatAssistant",
     sub_agents=[answer_agent],  # Primary agent - others called as needed
     description="Fully agentic document chat system - agents dynamically manage context and knowledge"
 )
