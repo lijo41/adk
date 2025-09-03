@@ -132,6 +132,85 @@ Return ONLY the JSON array, no explanations or other text:"""
         
         return validated
     
+    def extract_gstr1_data(self, chunks: List[str], user_gstin: str, user_company_name: str) -> Dict[str, Any]:
+        """Extract GSTR-1 data from filtered chunks."""
+        try:
+            # Convert chunks to content
+            content = "\n".join(chunks)
+            
+            prompt = f"""
+Extract GST invoice information from these document chunks for GSTR-1 filing.
+
+Company Details:
+- GSTIN: {user_gstin}
+- Company Name: {user_company_name}
+
+Extract all B2B invoices and return structured data in this exact format:
+{{
+  "total_invoices": 0,
+  "b2b_invoices": 0,
+  "total_taxable_value": 0.0,
+  "total_tax_amount": 0.0,
+  "invoices": [
+    {{
+      "invoice_no": "INV-001",
+      "invoice_date": "2025-08-24",
+      "recipient_gstin": "32AACCB1122B1ZB",
+      "place_of_supply": "Kerala (32)",
+      "invoice_value": 13924,
+      "items": [
+        {{
+          "product_name": "Product Name",
+          "hsn_code": "8467",
+          "quantity": 2,
+          "unit_price": 3500,
+          "taxable_value": 7000,
+          "igst": 1260,
+          "cgst": 0,
+          "sgst": 0,
+          "cess": 0
+        }}
+      ]
+    }}
+  ]
+}}
+
+Document content:
+{content}
+
+Return as JSON with the exact structure above:"""
+
+            response = self.model.generate_content(prompt)
+            response_text = response.text.strip()
+            
+            # Clean up response to extract JSON
+            if "```json" in response_text:
+                response_text = response_text.split("```json")[1].split("```")[0]
+            elif "```" in response_text:
+                response_text = response_text.split("```")[1].split("```")[0]
+            
+            result = json.loads(response_text)
+            
+            # Ensure required fields exist
+            return {
+                "total_invoices": result.get("total_invoices", 0),
+                "b2b_invoices": result.get("b2b_invoices", 0),
+                "total_taxable_value": float(result.get("total_taxable_value", 0)),
+                "total_tax_amount": float(result.get("total_tax_amount", 0)),
+                "invoices": result.get("invoices", [])
+            }
+            
+        except Exception as e:
+            print(f"Error in extract_gstr1_data: {str(e)}")
+            # Return fallback data
+            return {
+                "total_invoices": 0,
+                "b2b_invoices": 0,
+                "total_taxable_value": 0.0,
+                "total_tax_amount": 0.0,
+                "invoices": []
+            }
+    
     def extract_company_details(self, content: str) -> Dict[str, str]:
         """Extract company details from document content."""
         prompt = f"""

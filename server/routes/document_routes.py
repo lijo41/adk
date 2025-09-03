@@ -5,39 +5,61 @@ from sqlalchemy.orm import Session
 from database.database import get_db
 from auth.dependencies import get_current_active_user
 from schemas.simplified_schemas import UserDB
+from usecases.shared_instances import get_document_processing_agent
 import uuid
+import tempfile
+import os
 
 document_router = APIRouter(prefix="/api/documents", tags=["documents"])
 
 @document_router.post("/upload")
 async def upload_documents(
-    files: list[UploadFile] = File(...),
+    file: UploadFile = File(...),
     current_user: UserDB = Depends(get_current_active_user)
 ):
-    """Upload and process multiple documents."""
+    """Upload and process single document with parsing and chunking."""
     try:
-        processed_files = []
+        # Get document processing agent
+        doc_agent = get_document_processing_agent()
         
-        for file in files:
-            # Read file content
-            content = await file.read()
+        # Read file content
+        content = await file.read()
+        
+        # Create temporary file for processing
+        with tempfile.NamedTemporaryFile(delete=False, suffix=f"_{file.filename}") as temp_file:
+            temp_file.write(content)
+            temp_file_path = temp_file.name
+        
+        try:
+            # Use document processing agent to parse and chunk
+            from agents.document_processing_agent import parse_document_content, document_store
             
-            # Simple in-memory processing - no persistence
+            # Parse document content
+            parse_result = parse_document_content(temp_file_path)
+            
+            if parse_result.startswith("Error"):
+                raise HTTPException(status_code=400, detail=parse_result)
+            
+            # Generate document ID
             document_id = str(uuid.uuid4())
             
-            processed_files.append({
+            # Get chunks for this document
+            chunks = document_store["chunks"].get(file.filename, [])
+            
+            return {
                 "document_id": document_id,
                 "filename": file.filename,
                 "status": "processed",
                 "content_length": len(content),
-                "content_type": file.content_type
-            })
-        
-        return {
-            "uploaded_files": processed_files,
-            "total_files": len(processed_files),
-            "message": f"Successfully processed {len(processed_files)} documents"
-        }
+                "content_type": file.content_type,
+                "chunks_created": len(chunks),
+                "parse_result": parse_result
+            }
+            
+        finally:
+            # Clean up temporary file
+            if os.path.exists(temp_file_path):
+                os.unlink(temp_file_path)
         
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

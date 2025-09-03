@@ -6,8 +6,35 @@ from pathlib import Path
 from datetime import datetime
 from typing import List, Dict, Any, Optional
 from docling.document_converter import DocumentConverter
+from enum import Enum
 
 # Document models removed - processing in-memory only
+
+class DocumentType(Enum):
+    PDF = "pdf"
+    DOCX = "docx"
+    TXT = "txt"
+    MD = "md"
+
+class Document:
+    def __init__(self, id: str, filename: str, file_type: DocumentType, file_path: str, 
+                 upload_date: datetime, processed: bool = False):
+        self.id = id
+        self.filename = filename
+        self.file_type = file_type
+        self.file_path = file_path
+        self.upload_date = upload_date
+        self.processed = processed
+
+class DocumentChunk:
+    def __init__(self, id: str, document_id: str, content: str, chunk_index: int, 
+                 start_char: int, end_char: int):
+        self.id = id
+        self.document_id = document_id
+        self.content = content
+        self.chunk_index = chunk_index
+        self.start_char = start_char
+        self.end_char = end_char
 
 
 class DocumentUseCase:
