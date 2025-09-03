@@ -2,7 +2,9 @@
 
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
-from typing import List, Optional
+from typing import List, Dict, Any
+from usecases.gstr1_usecase import GSTR1UseCase
+from models.gstr1 import GSTR1Header
 from decimal import Decimal
 import os
 from dotenv import load_dotenv
@@ -85,9 +87,37 @@ async def generate_gstr1_json(return_id: str):
         if not gstr1_return:
             raise HTTPException(status_code=404, detail="GSTR-1 return not found")
         
-        json_data = gstr1_usecase.generate_gstr1_json(gstr1_return)
+        # Generate JSON and save to database
+        gstr1_usecase.save_gstr1_return(gstr1_return)
+        json_data = gstr1_return.json_data
+        
+        if not json_data:
+            json_data = gstr1_usecase.generate_gstr1_json(gstr1_return)
+            
         return json_data
         
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@gstr1_router.delete("/clear")
+async def clear_database():
+    """Clear all GSTR-1 data from database."""
+    try:
+        gstr1_usecase.clear_database()
+        return {"message": "Database cleared successfully"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@gstr1_router.get("/{return_id}/table")
+async def get_gstr1_table(return_id: str):
+    """Get GSTR-1 data in table format."""
+    try:
+        table_data = gstr1_usecase.get_gstr1_table_view(return_id)
+        if not table_data:
+            raise HTTPException(status_code=404, detail="GSTR-1 return not found")
+        return table_data
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

@@ -28,7 +28,6 @@ with st.sidebar:
         response = requests.get(f"{BACKEND_URL}/health", timeout=5)
         if response.status_code == 200:
             st.success("✅ Backend is running")
-            st.json(response.json())
         else:
             st.error("❌ Backend error")
     except requests.exceptions.RequestException:
@@ -117,10 +116,66 @@ with tab2:
                         if response.status_code == 200:
                             result = response.json()
                             st.success("GSTR-1 return created!")
-                            st.json(result)
                             
                             # Store return_id in session state for use outside form
                             st.session_state.latest_return_id = result.get("return_id")
+                            
+                            # Show table data from database instead of JSON
+                            if st.session_state.latest_return_id:
+                                try:
+                                    table_response = requests.get(f"{BACKEND_URL}/api/gstr1/{st.session_state.latest_return_id}/table")
+                                    if table_response.status_code == 200:
+                                        table_data = table_response.json()
+                                        
+                                        # Display header info
+                                        st.subheader("📋 GSTR-1 Filing Summary")
+                                        header = table_data.get('header', {})
+                                        col1, col2 = st.columns(2)
+                                        with col1:
+                                            st.write(f"**GSTIN:** {header.get('gstin', 'N/A')}")
+                                            st.write(f"**Company:** {header.get('company_name', 'N/A')}")
+                                        with col2:
+                                            st.write(f"**Period:** {header.get('filing_period', 'N/A')}")
+                                            st.write(f"**Status:** {header.get('status', 'N/A')}")
+                                        
+                                        # Display summary
+                                        summary = table_data.get('summary', {})
+                                        st.subheader("📊 Summary")
+                                        col1, col2, col3, col4 = st.columns(4)
+                                        with col1:
+                                            st.metric("Total Invoices", summary.get('total_invoices', 0))
+                                        with col2:
+                                            st.metric("Taxable Value", f"₹{summary.get('total_taxable_value', 0):,.2f}")
+                                        with col3:
+                                            st.metric("Total Tax", f"₹{summary.get('total_tax', 0):,.2f}")
+                                        with col4:
+                                            st.metric("Invoice Value", f"₹{summary.get('total_invoice_value', 0):,.2f}")
+                                        
+                                        # Display invoices table
+                                        invoices = table_data.get('invoices', [])
+                                        if invoices:
+                                            st.subheader("🧾 Invoice Details")
+                                            for i, invoice in enumerate(invoices, 1):
+                                                with st.expander(f"Invoice {i}: {invoice.get('invoice_no', 'N/A')} - ₹{invoice.get('invoice_value', 0):,.2f}"):
+                                                    col1, col2 = st.columns(2)
+                                                    with col1:
+                                                        st.write(f"**Invoice No:** {invoice.get('invoice_no', 'N/A')}")
+                                                        st.write(f"**Date:** {invoice.get('invoice_date', 'N/A')}")
+                                                        st.write(f"**Recipient GSTIN:** {invoice.get('recipient_gstin', 'N/A')}")
+                                                    with col2:
+                                                        st.write(f"**Place of Supply:** {invoice.get('place_of_supply', 'N/A')}")
+                                                        st.write(f"**Invoice Value:** ₹{invoice.get('invoice_value', 0):,.2f}")
+                                                    
+                                                    # Display items
+                                                    items = invoice.get('items', [])
+                                                    if items:
+                                                        st.write("**Items:**")
+                                                        for item in items:
+                                                            st.write(f"• {item.get('product_name', 'N/A')} (HSN: {item.get('hsn_code', 'N/A')})")
+                                                            st.write(f"  Qty: {item.get('quantity', 0)}, Rate: ₹{item.get('unit_price', 0):,.2f}, Taxable: ₹{item.get('taxable_value', 0):,.2f}")
+                                                            st.write(f"  IGST: ₹{item.get('igst', 0):,.2f}, CGST: ₹{item.get('cgst', 0):,.2f}, SGST: ₹{item.get('sgst', 0):,.2f}")
+                                except Exception as e:
+                                    st.error(f"Failed to load table data: {str(e)}")
                         else:
                             st.error(f"Creation failed: {response.text}")
                     except requests.exceptions.RequestException as e:
@@ -128,22 +183,13 @@ with tab2:
                 else:
                     st.error("Please fill all required fields")
         
-        # Button outside the form to view JSON template
-        if hasattr(st.session_state, 'latest_return_id') and st.session_state.latest_return_id:
-            if st.button("View Full JSON Template", key="view_json_template"):
-                try:
-                    json_response = requests.get(f"{BACKEND_URL}/api/gstr1/{st.session_state.latest_return_id}/json")
-                    if json_response.status_code == 200:
-                        st.subheader("Complete GSTR-1 JSON Template")
-                        st.json(json_response.json())
-                    else:
-                        st.error("Failed to fetch JSON template")
-                except requests.exceptions.RequestException as e:
-                    st.error(f"Request failed: {str(e)}")
     
     with col2:
         st.subheader("GSTR-1 Returns")
         if st.button("List Returns"):
+            st.session_state.show_returns = True
+        
+        if st.session_state.get("show_returns", False):
             try:
                 response = requests.get(f"{BACKEND_URL}/api/gstr1/list")
                 if response.status_code == 200:
@@ -155,28 +201,82 @@ with tab2:
                             # Add buttons for each return
                             col_a, col_b = st.columns(2)
                             with col_a:
-                                if st.button(f"View JSON", key=f"view_{return_id}"):
-                                    try:
-                                        json_response = requests.get(f"{BACKEND_URL}/api/gstr1/{return_id}/json")
-                                        if json_response.status_code == 200:
-                                            st.subheader(f"GSTR-1 JSON for {return_id}")
-                                            st.json(json_response.json())
-                                        else:
-                                            st.error("Failed to fetch JSON")
-                                    except requests.exceptions.RequestException as e:
-                                        st.error(f"Request failed: {str(e)}")
+                                if st.button(f"View Table", key=f"table_{return_id}"):
+                                    st.session_state[f"show_table_{return_id}"] = True
                             
                             with col_b:
                                 if st.button(f"View Details", key=f"details_{return_id}"):
-                                    try:
-                                        details_response = requests.get(f"{BACKEND_URL}/api/gstr1/{return_id}")
-                                        if details_response.status_code == 200:
-                                            st.subheader(f"GSTR-1 Details for {return_id}")
-                                            st.json(details_response.json())
-                                        else:
-                                            st.error("Failed to fetch details")
-                                    except requests.exceptions.RequestException as e:
-                                        st.error(f"Request failed: {str(e)}")
+                                    st.session_state[f"show_details_{return_id}"] = True
+                            
+                            # Display table data if requested
+                            if st.session_state.get(f"show_table_{return_id}", False):
+                                try:
+                                    table_response = requests.get(f"{BACKEND_URL}/api/gstr1/{return_id}/table")
+                                    if table_response.status_code == 200:
+                                        table_data = table_response.json()
+                                        st.subheader(f"GSTR-1 Table Data for {return_id}")
+                                        
+                                        # Display header info
+                                        header = table_data.get('header', {})
+                                        col1, col2 = st.columns(2)
+                                        with col1:
+                                            st.write(f"**GSTIN:** {header.get('gstin', 'N/A')}")
+                                            st.write(f"**Company:** {header.get('company_name', 'N/A')}")
+                                        with col2:
+                                            st.write(f"**Period:** {header.get('filing_period', 'N/A')}")
+                                            st.write(f"**Status:** {header.get('status', 'N/A')}")
+                                        
+                                        # Display summary
+                                        summary = table_data.get('summary', {})
+                                        st.write("**Summary:**")
+                                        col1, col2, col3, col4 = st.columns(4)
+                                        with col1:
+                                            st.metric("Invoices", summary.get('total_invoices', 0))
+                                        with col2:
+                                            st.metric("Taxable Value", f"₹{summary.get('total_taxable_value', 0):,.2f}")
+                                        with col3:
+                                            st.metric("Total Tax", f"₹{summary.get('total_tax', 0):,.2f}")
+                                        with col4:
+                                            st.metric("Invoice Value", f"₹{summary.get('total_invoice_value', 0):,.2f}")
+                                        
+                                        # Display invoices
+                                        invoices = table_data.get('invoices', [])
+                                        if invoices:
+                                            st.write("**Invoice Details:**")
+                                            for i, invoice in enumerate(invoices, 1):
+                                                with st.expander(f"Invoice {i}: {invoice.get('invoice_no', 'N/A')}"):
+                                                    st.write(f"Date: {invoice.get('invoice_date', 'N/A')}")
+                                                    st.write(f"Value: ₹{invoice.get('invoice_value', 0):,.2f}")
+                                                    st.write(f"Recipient: {invoice.get('recipient_gstin', 'N/A')}")
+                                        
+                                        if st.button(f"Hide Table", key=f"hide_table_{return_id}"):
+                                            st.session_state[f"show_table_{return_id}"] = False
+                                            st.rerun()
+                                    else:
+                                        st.error(f"Failed to fetch table data: {table_response.status_code}")
+                                except requests.exceptions.RequestException as e:
+                                    st.error(f"Request failed: {str(e)}")
+                            
+                            # Display details if requested
+                            if st.session_state.get(f"show_details_{return_id}", False):
+                                try:
+                                    details_response = requests.get(f"{BACKEND_URL}/api/gstr1/{return_id}")
+                                    if details_response.status_code == 200:
+                                        details = details_response.json()
+                                        st.subheader(f"Return Details for {return_id}")
+                                        st.write(f"**GSTIN:** {details.get('gstin', 'N/A')}")
+                                        st.write(f"**Company:** {details.get('company_name', 'N/A')}")
+                                        st.write(f"**Period:** {details.get('filing_period', 'N/A')}")
+                                        st.write(f"**Status:** {details.get('status', 'N/A')}")
+                                        st.write(f"**Created:** {details.get('created_time', 'N/A')}")
+                                        
+                                        if st.button(f"Hide Details", key=f"hide_details_{return_id}"):
+                                            st.session_state[f"show_details_{return_id}"] = False
+                                            st.rerun()
+                                    else:
+                                        st.error(f"Failed to fetch details: {details_response.status_code}")
+                                except requests.exceptions.RequestException as e:
+                                    st.error(f"Request failed: {str(e)}")
                     else:
                         st.info("No GSTR-1 returns created yet")
                 else:
@@ -234,12 +334,3 @@ with tab3:
                     st.error(error_msg)
                     st.session_state.messages.append({"role": "assistant", "content": error_msg})
 
-# Footer
-st.markdown("---")
-st.markdown("**Backend API Endpoints:**")
-st.code(f"""
-Documents: {BACKEND_URL}/api/documents
-GSTR-1: {BACKEND_URL}/api/gstr1  
-Chat: {BACKEND_URL}/api/chat
-Health: {BACKEND_URL}/health
-""")

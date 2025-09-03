@@ -1,0 +1,48 @@
+{
+  "gstr1_return": {
+    "header": {
+      "gstin": "27ABCDE1234F1Z5",
+      "company_name": "Test Company Ltd",
+      "filing_period": "082024"
+    },
+    "invoices": [
+      {
+        "invoice_no": "GST-4525-26",
+        "invoice_date": "2025-08-24",
+        "recipient_gstin": "32AACCB1122B1ZB",
+        "place_of_supply": "Kerala (32)",
+        "invoice_value": 13924.0,
+        "items": [
+          {
+            "product_name": "Hitachi Power Drill",
+            "hsn_code": "8467",
+            "quantity": "2",
+            "unit_price": 3500,
+            "taxable_value": 7000.0,
+            "igst": 1260.0,
+            "cgst": null,
+            "sgst": null,
+            "cess": null
+          },
+          {
+            "product_name": "Makita Angle Grinder",
+            "hsn_code": "8467",
+            "quantity": "1",
+            "unit_price": 4800,
+            "taxable_value": 4800.0,
+            "igst": 864.0,
+            "cgst": null,
+            "sgst": null,
+            "cess": null
+          }
+        ]
+      }
+    ],
+    "summary": {
+      "total_invoices": 1,
+      "total_taxable_value": 11800.0,
+      "total_tax": 2124.0,
+      "total_invoice_value": 13924.0
+    }
+  }
+}
