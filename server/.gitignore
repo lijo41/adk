@@ -68,7 +68,7 @@ chroma_db/
 
 # Model cache
 .cache/
-models/
+# models/ - commented out to allow backend models folder
 
 # Jupyter Notebooks
 .ipynb_checkpoints/

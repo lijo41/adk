@@ -64,128 +64,20 @@ class GST1Invoice(BaseModel):
     totals: GST1InvoiceTotals = GST1InvoiceTotals()
 
 def get_empty_gstr1_template() -> Dict[str, Any]:
-    """Returns an empty GSTR1 template structure."""
+    """Returns a simplified GSTR1 template structure."""
     return {
         "gstr1_return": {
             "header": {
                 "gstin": "",
                 "company_name": "",
-                "filing_period": "",
-                "gross_turnover": 0,
-                "return_period": "",
-                "filing_date": "",
-                "amendment": False,
-                "late_fee": 0
+                "filing_period": ""
             },
-            "b2b_supplies": {
-                "section": "4A, 4B, 4C, 6C",
-                "description": "Business to Business Supplies",
-                "invoices": [],
-                "summary": {
-                    "total_invoices": 0,
-                    "total_taxable_value": 0,
-                    "total_tax_amount": 0,
-                    "total_invoice_value": 0
-                }
-            },
-            "b2cl_supplies": {
-                "section": "5A, 5B",
-                "description": "Business to Consumer Large (>2.5L) Supplies",
-                "invoices": []
-            },
-            "b2cs_supplies": {
-                "section": "7",
-                "description": "Business to Consumer Small (<2.5L) Supplies",
-                "consolidated_data": []
-            },
-            "zero_rated_supplies": {
-                "exports": {
-                    "section": "8A",
-                    "description": "Exports with Payment of Tax",
-                    "invoices": []
-                },
-                "supplies_to_sez": {
-                    "section": "8B",
-                    "description": "Supplies to SEZ with Payment of Tax",
-                    "invoices": []
-                },
-                "deemed_exports": {
-                    "section": "8C",
-                    "description": "Deemed Exports",
-                    "invoices": []
-                }
-            },
-            "nil_exempt_supplies": {
-                "section": "9",
-                "description": "Nil Rated, Exempted and Non-GST Supplies",
-                "details": [
-                    {
-                        "description": "Nil Rated Supplies",
-                        "inter_state": 0,
-                        "intra_state": 0
-                    },
-                    {
-                        "description": "Exempted Supplies",
-                        "inter_state": 0,
-                        "intra_state": 0
-                    },
-                    {
-                        "description": "Non-GST Supplies",
-                        "inter_state": 0,
-                        "intra_state": 0
-                    }
-                ]
-            },
-            "credit_debit_notes": {
-                "registered": {
-                    "section": "9B",
-                    "description": "Credit/Debit Notes (Registered)",
-                    "notes": []
-                },
-                "unregistered": {
-                    "section": "9C",
-                    "description": "Credit/Debit Notes (Unregistered)",
-                    "notes": []
-                }
-            },
-            "hsn_summary": {
-                "section": "12",
-                "description": "HSN-wise Summary of Outward Supplies",
-                "hsn_data": []
-            },
-            "documents_issued": {
-                "section": "13",
-                "description": "Documents Issued During the Tax Period",
-                "document_details": [
-                    {
-                        "sr_no": 1,
-                        "nature_of_document": "Invoices for outward supply",
-                        "from_serial_no": "",
-                        "to_serial_no": "",
-                        "total_number": 0,
-                        "cancelled": 0
-                    }
-                ]
-            },
-            "amendments": {
-                "description": "Amendment Details",
-                "amended_invoices": [],
-                "amendment_summary": {
-                    "total_amendments": 0,
-                    "net_tax_liability_change": 0
-                }
-            },
-            "overall_summary": {
-                "total_taxable_value": 0,
-                "total_igst": 0,
-                "total_cgst": 0,
-                "total_sgst": 0,
-                "total_cess": 0,
-                "total_tax_liability": 0,
+            "invoices": [],
+            "summary": {
                 "total_invoices": 0,
-                "filing_status": "Draft",
-                "validation_errors": [],
-                "warnings": []
+                "total_taxable_value": 0,
+                "total_tax": 0,
+                "total_invoice_value": 0
             }
         }
     }
