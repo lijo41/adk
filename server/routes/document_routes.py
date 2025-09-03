@@ -10,24 +10,33 @@ import uuid
 document_router = APIRouter(prefix="/api/documents", tags=["documents"])
 
 @document_router.post("/upload")
-async def upload_document(
-    file: UploadFile = File(...),
+async def upload_documents(
+    files: list[UploadFile] = File(...),
     current_user: UserDB = Depends(get_current_active_user)
 ):
-    """Upload and process document in-memory only."""
+    """Upload and process multiple documents."""
     try:
-        # Read file content
-        content = await file.read()
+        processed_files = []
         
-        # Simple in-memory processing - no persistence
-        document_id = str(uuid.uuid4())
+        for file in files:
+            # Read file content
+            content = await file.read()
+            
+            # Simple in-memory processing - no persistence
+            document_id = str(uuid.uuid4())
+            
+            processed_files.append({
+                "document_id": document_id,
+                "filename": file.filename,
+                "status": "processed",
+                "content_length": len(content),
+                "content_type": file.content_type
+            })
         
         return {
-            "document_id": document_id,
-            "filename": file.filename,
-            "status": "processed",
-            "content_length": len(content),
-            "message": "Document processed in-memory (no storage)"
+            "uploaded_files": processed_files,
+            "total_files": len(processed_files),
+            "message": f"Successfully processed {len(processed_files)} documents"
         }
         
     except Exception as e:
