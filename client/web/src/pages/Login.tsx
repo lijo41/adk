@@ -3,31 +3,32 @@ import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import { Button } from '../components/ui/Button.tsx';
 import { Input } from '../components/ui/Input.tsx';
-import { authAPI, type LoginRequest } from '../api/auth.ts';
+import { authApi } from '../api/auth.ts';
+import type { UserLogin } from '../types/index.ts';
 import { useAuthStore } from '../store/authStore.ts';
 
 const Login: React.FC = () => {
-  const [formData, setFormData] = useState<LoginRequest>({
+  const [formData, setFormData] = useState<UserLogin>({
     username: '',
-    password: '',
+    password: ''
   });
   const [loading, setLoading] = useState(false);
-  const [errors, setErrors] = useState<Partial<LoginRequest>>({});
+  const [errors, setErrors] = useState<Partial<UserLogin>>({});
 
   const navigate = useNavigate();
   const { login } = useAuthStore();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev: UserLogin) => ({ ...prev, [name]: value }));
     // Clear error when user starts typing
-    if (errors[name as keyof LoginRequest]) {
-      setErrors(prev => ({ ...prev, [name]: undefined }));
+    if (errors[name as keyof UserLogin]) {
+      setErrors((prev: any) => ({ ...prev, [name]: undefined }));
     }
   };
 
   const validateForm = (): boolean => {
-    const newErrors: Partial<LoginRequest> = {};
+    const newErrors: Partial<UserLogin> = {};
 
     if (!formData.username.trim()) {
       newErrors.username = 'Username is required';
@@ -50,16 +51,16 @@ const Login: React.FC = () => {
 
     setLoading(true);
     try {
-      const authResponse = await authAPI.login(formData);
+      const response = await authApi.login(formData);
       
       // Store token first to enable authenticated requests
-      login(authResponse.access_token, null);
+      login(response.access_token, null);
       
       // Get user profile with authenticated request
-      const userProfile = await authAPI.getProfile();
+      const userProfile = await authApi.getProfile();
       
       // Update with user data
-      login(authResponse.access_token, userProfile);
+      login(response.access_token, userProfile);
       
       toast.success('Login successful!');
       navigate('/dashboard');

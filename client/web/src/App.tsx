@@ -3,6 +3,10 @@ import { Toaster } from 'react-hot-toast';
 import Login from './pages/Login.tsx';
 import Register from './pages/Register.tsx';
 import Dashboard from './pages/Dashboard.tsx';
+import FileUpload from './pages/FileUpload.tsx';
+import SmartAnalysis from './pages/SmartAnalysis.tsx';
+import FilingDetails from './pages/FilingDetails.tsx';
+import FilingReport from './pages/FilingReport.tsx';
 import { useAuthStore } from './store/authStore.ts';
 
 function App() {
@@ -23,6 +27,22 @@ function App() {
           <Route 
             path="/dashboard" 
             element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" />} 
+          />
+          <Route 
+            path="/filing/upload" 
+            element={isAuthenticated ? <FileUpload /> : <Navigate to="/login" />} 
+          />
+          <Route 
+            path="/filing/analysis" 
+            element={isAuthenticated ? <SmartAnalysis /> : <Navigate to="/login" />} 
+          />
+          <Route 
+            path="/filing/details" 
+            element={isAuthenticated ? <FilingDetails /> : <Navigate to="/login" />} 
+          />
+          <Route 
+            path="/filing/report" 
+            element={isAuthenticated ? <FilingReport /> : <Navigate to="/login" />} 
           />
           <Route 
             path="/" 

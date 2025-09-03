@@ -39,6 +39,9 @@ class DateFilteringAgent:
             Dictionary containing filtered chunks and analysis
         """
         # Parse dates based on format
+        date_patterns = []  # Initialize date_patterns
+        period_desc = ""
+        
         if start_date and end_date:
             try:
                 # Try YYYY-MM-DD format first (ISO format)
@@ -51,6 +54,11 @@ class DateFilteringAgent:
                     end_dt = datetime.strptime(end_date, "%d/%m/%Y")
                 else:
                     return {"error": "Invalid date format. Use YYYY-MM-DD or DD/MM/YYYY format"}
+                
+                # Generate date patterns for the date range
+                date_patterns = self._generate_date_range_patterns(start_dt, end_dt)
+                period_desc = f"{start_date} to {end_date}"
+                
             except ValueError as e:
                 return {"error": f"Invalid date format. Use YYYY-MM-DD or DD/MM/YYYY format: {str(e)}"}
         elif filing_month and filing_year:
@@ -168,6 +176,31 @@ class DateFilteringAgent:
             if current_dt > end_dt:
                 break
         
+        return patterns
+    
+    def _generate_date_range_patterns(self, start_dt: datetime, end_dt: datetime) -> List[str]:
+        """Generate date patterns for a custom date range."""
+        patterns = []
+        current_dt = start_dt
+        
+        while current_dt <= end_dt:
+            # Add various date formats for each day in the range
+            patterns.extend([
+                current_dt.strftime("%d/%m/%Y"),
+                current_dt.strftime("%d-%m-%Y"),
+                current_dt.strftime("%d.%m.%Y"),
+                current_dt.strftime("%Y-%m-%d"),
+                current_dt.strftime("%d %B %Y"),
+                current_dt.strftime("%d %b %Y"),
+                current_dt.strftime("%B %d, %Y"),
+                current_dt.strftime("%b %d, %Y")
+            ])
+            current_dt += timedelta(days=1)
+            
+            # Limit patterns to avoid performance issues
+            if len(patterns) > 1000:
+                break
+                
         return patterns
     
     def _has_relevant_dates(self, chunk: str, date_patterns: List[str]) -> bool:

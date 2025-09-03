@@ -3,34 +3,36 @@ import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import { Button } from '../components/ui/Button.tsx';
 import { Input } from '../components/ui/Input.tsx';
-import { authAPI, type RegisterRequest } from '../api/auth.ts';
+import { authApi } from '../api/auth.ts';
+import type { UserRegistration } from '../types/index.ts';
 
 const Register: React.FC = () => {
-  const [formData, setFormData] = useState<RegisterRequest>({
+  const [formData, setFormData] = useState<UserRegistration & { confirmPassword: string }>({
     email: '',
     username: '',
     password: '',
+    confirmPassword: '',
     full_name: '',
-    company_name: '',
-    gstin: '',
     phone: '',
+    company_name: '',
+    gstin: ''
   });
   const [loading, setLoading] = useState(false);
-  const [errors, setErrors] = useState<Partial<RegisterRequest>>({});
+  const [errors, setErrors] = useState<Partial<UserRegistration & { confirmPassword: string }>>({});
 
   const navigate = useNavigate();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev: UserRegistration & { confirmPassword: string }) => ({ ...prev, [name]: value }));
     // Clear error when user starts typing
-    if (errors[name as keyof RegisterRequest]) {
-      setErrors(prev => ({ ...prev, [name]: undefined }));
+    if (errors[name as keyof (UserRegistration & { confirmPassword: string })]) {
+      setErrors((prev: any) => ({ ...prev, [name]: undefined }));
     }
   };
 
   const validateForm = (): boolean => {
-    const newErrors: Partial<RegisterRequest> = {};
+    const newErrors: Partial<UserRegistration & { confirmPassword: string }> = {};
 
     if (!formData.email.trim()) {
       newErrors.email = 'Email is required';
@@ -48,8 +50,8 @@ const Register: React.FC = () => {
       newErrors.password = 'Password must be at least 6 characters';
     }
 
-    if (!formData.full_name.trim()) {
-      newErrors.full_name = 'Full name is required';
+    if (formData.full_name && formData.full_name.trim().length < 2) {
+      newErrors.full_name = 'Full name must be at least 2 characters';
     }
 
     if (!formData.company_name.trim()) {
@@ -75,7 +77,8 @@ const Register: React.FC = () => {
 
     setLoading(true);
     try {
-      await authAPI.register(formData);
+      const { confirmPassword, ...registrationData } = formData;
+      await authApi.register(registrationData);
       toast.success('Registration successful! Please login.');
       navigate('/login');
     } catch (error: any) {

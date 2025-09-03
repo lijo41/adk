@@ -15,6 +15,7 @@ from routes.auth_routes import auth_router
 from routes.categorization_routes import categorization_router
 from routes.filing_routes import filing_router
 from routes.reports_routes import reports_router
+from routes.cleanup_routes import router as cleanup_router
 
 # Load environment variables
 load_dotenv()
@@ -76,6 +77,7 @@ app.include_router(gstr1_router)
 app.include_router(categorization_router)
 app.include_router(filing_router)
 app.include_router(reports_router)
+app.include_router(cleanup_router)
 
 @app.get("/")
 async def root():

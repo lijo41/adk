@@ -1,77 +1,96 @@
 import axios from 'axios';
+import type { User, UserLogin, UserRegistration, AuthResponse } from '../types';
 
 const API_BASE_URL = 'http://localhost:8000/api';
 
-const api = axios.create({
+// Create axios instance with default config
+const apiClient = axios.create({
   baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },
 });
 
-// Add auth token to requests
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('auth-storage');
+// Request interceptor to add auth token
+apiClient.interceptors.request.use((config) => {
+  const token = getAuthToken();
   if (token) {
-    try {
-      const authData = JSON.parse(token);
-      if (authData.state?.token) {
-        config.headers.Authorization = `Bearer ${authData.state.token}`;
-      }
-    } catch (error) {
-      console.error('Error parsing auth token:', error);
-    }
+    config.headers.Authorization = `Bearer ${token}`;
   }
   return config;
 });
 
-export interface LoginRequest {
-  username: string;
-  password: string;
-}
+// Response interceptor for error handling
+apiClient.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      // Clear stored auth data on 401
+      localStorage.removeItem('auth-storage');
+      window.location.href = '/login';
+    }
+    return Promise.reject(error);
+  }
+);
 
-export interface RegisterRequest {
-  email: string;
-  username: string;
-  password: string;
-  full_name: string;
-  company_name: string;
-  gstin: string;
-  phone?: string;
-}
-
-export interface AuthResponse {
-  access_token: string;
-  token_type: string;
-}
-
-export interface UserResponse {
-  id: string;
-  email: string;
-  username: string;
-  full_name: string;
-  company_name: string;
-  gstin: string;
-  phone?: string;
-  is_active: boolean;
-  is_verified: boolean;
-}
-
-export const authAPI = {
-  login: async (data: LoginRequest): Promise<AuthResponse> => {
-    const response = await api.post('/auth/login', data);
+// Auth API functions
+export const authApi = {
+  async login(credentials: UserLogin): Promise<AuthResponse> {
+    const response = await apiClient.post('/auth/login', credentials);
     return response.data;
   },
 
-  register: async (data: RegisterRequest): Promise<UserResponse> => {
-    const response = await api.post('/auth/register', data);
+  async register(userData: UserRegistration): Promise<AuthResponse> {
+    const response = await apiClient.post('/auth/register', userData);
     return response.data;
   },
 
-  getProfile: async (): Promise<UserResponse> => {
-    const response = await api.get('/auth/me');
+  async getProfile(): Promise<User> {
+    const response = await apiClient.get('/auth/profile');
     return response.data;
   },
+
+  async updateProfile(profileData: Partial<Pick<User, 'full_name' | 'phone' | 'company_name'>>): Promise<User> {
+    const response = await apiClient.put('/auth/profile', profileData);
+    return response.data;
+  },
+
+  async changePassword(passwordData: {
+    current_password: string;
+    new_password: string;
+  }): Promise<{ message: string }> {
+    const response = await apiClient.put('/auth/change-password', passwordData);
+    return response.data;
+  },
+
+  async logout(): Promise<void> {
+    // Clear local storage
+    localStorage.removeItem('auth-storage');
+    // Optionally call logout endpoint if it exists
+    try {
+      await apiClient.post('/auth/logout');
+    } catch (error) {
+      // Ignore logout endpoint errors
+    }
+  }
 };
 
-export default api;
+export const getAuthToken = (): string | null => {
+  // Try direct token first
+  let token = localStorage.getItem('token');
+  if (token) return token;
+
+  // Try auth-storage format
+  const authStorage = localStorage.getItem('auth-storage');
+  if (authStorage) {
+    try {
+      const authData = JSON.parse(authStorage);
+      return authData.state?.token || null;
+    } catch (error) {
+      console.error('Error parsing auth token:', error);
+    }
+  }
+  
+  return null;
+};
+

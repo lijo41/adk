@@ -40,13 +40,20 @@ async def analyze_documents(
         # Get actual document chunks from document processing agent
         from agents.document_processing_agent import document_store
         
-        # Retrieve chunks from all processed documents
+        # Retrieve chunks from all processed documents with source tracking
         all_chunks = []
+        chunk_metadata = []  # Track which document each chunk came from
         processed_docs = []
         
         for filename, chunks in document_store["chunks"].items():
             if chunks:  # Only include documents that have been processed and chunked
-                all_chunks.extend(chunks)
+                for i, chunk in enumerate(chunks):
+                    all_chunks.append(chunk)
+                    chunk_metadata.append({
+                        "source_document": filename,
+                        "chunk_index_in_doc": i,
+                        "global_chunk_index": len(all_chunks) - 1
+                    })
                 processed_docs.append(filename)
         
         # If no processed documents found, use fallback
@@ -58,15 +65,47 @@ async def analyze_documents(
             ]
         
         # Perform categorization analysis on actual chunks
-        analysis_result = categorization_agent.categorize_chunks(all_chunks)
+        categorization_result = categorization_agent.categorize_chunks(all_chunks)
         
-        # Add session metadata
-        analysis_result["session_id"] = str(uuid.uuid4())
-        analysis_result["user_id"] = current_user.id
-        analysis_result["document_count"] = processed_docs
-        analysis_result["total_chunks"] = len(all_chunks)
+        # Add chunk source mapping to results
+        categorization_result["chunk_metadata"] = chunk_metadata
         
-        return analysis_result
+        # Create per-document breakdown
+        doc_breakdown = {}
+        for doc in processed_docs:
+            doc_breakdown[doc] = {
+                "gstr1_chunks": [],
+                "gstr2_chunks": [],
+                "irrelevant_chunks": [],
+                "total_chunks": 0
+            }
+        
+        # Map categorized chunks back to their source documents
+        chunk_categorizations = categorization_result.get("chunk_categorization", [])
+        for i, categorization in enumerate(chunk_categorizations):
+            if i < len(chunk_metadata):
+                source_doc = chunk_metadata[i]["source_document"]
+                category = categorization.get("category", "irrelevant")
+                
+                doc_breakdown[source_doc]["total_chunks"] += 1
+                
+                if category == "gstr1":
+                    doc_breakdown[source_doc]["gstr1_chunks"].append(i)
+                elif category == "gstr2":
+                    doc_breakdown[source_doc]["gstr2_chunks"].append(i)
+                else:
+                    doc_breakdown[source_doc]["irrelevant_chunks"].append(i)
+        
+        categorization_result["document_breakdown"] = doc_breakdown
+        
+        return {
+            "status": "success",
+            "processed_documents": processed_docs,
+            "total_chunks": len(all_chunks),
+            "categorization": categorization_result,
+            "session_id": str(uuid.uuid4()),
+            "user_id": current_user.id
+        }
         
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Analysis failed: {str(e)}")

@@ -25,45 +25,73 @@ class CategorizationAgent:
         """Fast keyword-based pre-filtering before LLM analysis."""
         chunk_lower = chunk.lower()
         
-        # GSTR-1 keywords (outward supplies/sales)
+        # GSTR-1 keywords (outward supplies/sales) - Company is SELLING
         gstr1_keywords = [
-            'invoice', 'bill', 'sale', 'supply', 'outward', 'b2b', 'b2c', 
-            'export', 'taxable value', 'cgst', 'sgst', 'igst', 'customer',
-            'buyer', 'recipient', 'gstin of recipient', 'place of supply'
+            'sale', 'sold', 'selling', 'outward supply', 'supply made', 'supply to',
+            'customer', 'buyer', 'gstin of recipient', 'sold to',
+            'place of supply', 'sales invoice', 'invoice to', 'billed to',
+            'delivered to', 'shipped to', 'consignee', 'b2b supply', 'b2c supply',
+            'tax invoice', 'original for recipient', 'invoice original'
         ]
         
-        # GSTR-2 keywords (inward supplies/purchases)
+        # GSTR-2 keywords (inward supplies/purchases) - Company is BUYING  
         gstr2_keywords = [
-            'purchase', 'procurement', 'inward', 'input tax credit', 'itc',
-            'vendor', 'supplier', 'gstin of supplier', 'reverse charge',
-            'import', 'customs', 'bill of entry'
+            'purchase', 'purchased', 'buying', 'procurement', 'inward supply', 'supply received',
+            'input tax credit', 'itc', 'vendor', 'supplier', 'gstin of supplier',
+            'reverse charge', 'import', 'customs', 'bill of entry', 'purchase invoice',
+            'from supplier', 'received from', 'bought from', 'procured from',
+            'invoice from', 'billed by', 'supplied by', 'vendor invoice',
+            'gstr-2', 'gstr2', 'inward supply invoice'
         ]
+        
+        # Common keywords that appear in both (should not heavily weight either direction)
+        common_keywords = ['invoice', 'bill', 'taxable value', 'cgst', 'sgst', 'igst']
         
         gstr1_score = sum(1 for keyword in gstr1_keywords if keyword in chunk_lower)
         gstr2_score = sum(1 for keyword in gstr2_keywords if keyword in chunk_lower)
         
-        # Quick classification based on keyword density
-        if gstr1_score > gstr2_score and gstr1_score >= 2:
+        # Enhanced classification logic with stronger GSTR-1 indicators
+        # Special handling for tax invoices (strong GSTR-1 indicator)
+        if 'tax invoice' in chunk_lower or 'original for recipient' in chunk_lower:
             return {
                 "chunk_index": chunk_index,
-                "category": "gstr1", 
-                "confidence": min(0.8, 0.5 + (gstr1_score * 0.1)),
-                "detected_data_types": ["invoice"] if "invoice" in chunk_lower else [],
-                "method": "keyword"
+                "category": "gstr1",
+                "confidence": 0.9,
+                "detected_data_types": ["outward_supply"],
+                "method": "keyword_strong"
             }
-        elif gstr2_score > gstr1_score and gstr2_score >= 2:
+        
+        # Special handling for GSTR-2 specific documents
+        if any(keyword in chunk_lower for keyword in ['gstr-2', 'gstr2', 'inward supply invoice']):
+            return {
+                "chunk_index": chunk_index,
+                "category": "gstr2",
+                "confidence": 0.9,
+                "detected_data_types": ["inward_supply"],
+                "method": "keyword_strong"
+            }
+        
+        if gstr2_score > gstr1_score and gstr2_score >= 1:
             return {
                 "chunk_index": chunk_index,
                 "category": "gstr2",
                 "confidence": min(0.8, 0.5 + (gstr2_score * 0.1)), 
-                "detected_data_types": ["purchase"] if "purchase" in chunk_lower else [],
+                "detected_data_types": ["purchase"] if "purchase" in chunk_lower else ["inward_supply"],
                 "method": "keyword"
             }
-        elif gstr1_score > 0 or gstr2_score > 0:
+        elif gstr1_score > gstr2_score and gstr1_score >= 1:
+            return {
+                "chunk_index": chunk_index,
+                "category": "gstr1", 
+                "confidence": min(0.8, 0.5 + (gstr1_score * 0.1)),
+                "detected_data_types": ["sale"] if any(word in chunk_lower for word in ['sale', 'sold']) else ["outward_supply"],
+                "method": "keyword"
+            }
+        elif gstr1_score == gstr2_score and (gstr1_score > 0 or gstr2_score > 0):
             return {
                 "chunk_index": chunk_index,
                 "category": "ambiguous",
-                "confidence": 0.3,
+                "confidence": 0.4,
                 "detected_data_types": [],
                 "method": "keyword"
             }
@@ -113,21 +141,21 @@ class CategorizationAgent:
         return {
             "gstr1_analysis": {
                 "relevant_chunks": gstr1_chunks,
-                "b2b_invoices_count": len([c for c in categorizations if c["category"] == "gstr1" and "invoice" in c.get("detected_data_types", [])]),
-                "b2c_invoices_count": 0,
-                "export_invoices_count": 0,
+                "outward_supply_count": len([c for c in categorizations if c["category"] == "gstr1" and any(dt in c.get("detected_data_types", []) for dt in ["sale", "outward_supply"])]),
                 "total_transactions": len(gstr1_chunks)
             },
             "gstr2_analysis": {
                 "relevant_chunks": gstr2_chunks,
-                "purchase_invoices_count": len([c for c in categorizations if c["category"] == "gstr2" and "purchase" in c.get("detected_data_types", [])]),
-                "import_invoices_count": 0,
+                "inward_supply_count": len([c for c in categorizations if c["category"] == "gstr2" and any(dt in c.get("detected_data_types", []) for dt in ["purchase", "inward_supply"])]),
                 "total_transactions": len(gstr2_chunks)
             },
-            "recommendations": {
-                "suggested_filings": self._get_suggested_filings(gstr1_chunks, gstr2_chunks),
-                "confidence_score": self._calculate_confidence(categorizations),
-                "notes": f"Fast categorization completed. {len(ambiguous_chunks)} chunks required LLM analysis."
+            "categorization_summary": {
+                "total_chunks": len(chunks),
+                "gstr1_chunks": len(gstr1_chunks),
+                "gstr2_chunks": len(gstr2_chunks),
+                "irrelevant_chunks": len([c for c in categorizations if c["category"] == "irrelevant"]),
+                "ambiguous_chunks_processed": len(ambiguous_chunks),
+                "overall_confidence": self._calculate_confidence(categorizations)
             },
             "chunk_categorization": categorizations
         }
@@ -140,8 +168,19 @@ class CategorizationAgent:
         # Create batch prompt for all ambiguous chunks
         batch_prompt = """Analyze these document chunks for GST categorization:
 
-GSTR-1 (outward supplies/sales): invoices, bills, sales, supplies to customers
-GSTR-2 (inward supplies/purchases): purchase invoices, procurement, input tax credit
+GSTR-1 (outward supplies/sales): 
+- TAX INVOICES issued by the company to customers
+- Documents where company is SELLING/SUPPLYING goods/services
+- Company GSTIN appears as supplier, customer GSTIN as recipient
+- Strong indicators: "TAX INVOICE", "ORIGINAL FOR RECIPIENT", company name at top as issuer
+- Keywords: "sold to", "supply to", "customer", "buyer", "billed to"
+
+GSTR-2 (inward supplies/purchases):
+- PURCHASE invoices received FROM other companies
+- Documents where company is BUYING/RECEIVING goods/services  
+- Company GSTIN appears as buyer, supplier GSTIN as issuer
+- Strong indicators: "PURCHASE INVOICE", "RECEIVED FROM", "SUPPLIER GSTIN"
+- Keywords: "purchased from", "supplier", "vendor", "received from", "bought from"
 
 Chunks to analyze:
 """
@@ -150,6 +189,10 @@ Chunks to analyze:
             batch_prompt += f"\nChunk {i+1} (Index {chunk_idx}): {chunk[:300]}...\n"
         
         batch_prompt += """
+Look for these key indicators:
+- GSTR-1: "TAX INVOICE" header, "ORIGINAL FOR RECIPIENT", company issuing invoice
+- GSTR-2: "PURCHASE INVOICE", "GSTR-2", company receiving invoice from supplier
+
 Respond with JSON only:
 {
   "results": [
@@ -157,7 +200,7 @@ Respond with JSON only:
       "chunk_index": 0,
       "category": "gstr1|gstr2|irrelevant", 
       "confidence": 0.0-1.0,
-      "detected_data_types": ["invoice", "purchase", etc.]
+      "detected_data_types": ["outward_supply", "inward_supply", "sale", "purchase"]
     }
   ]
 }"""
@@ -196,14 +239,6 @@ Respond with JSON only:
             "method": "fallback"
         } for chunk_idx, _ in ambiguous_chunks}
 
-    def _get_suggested_filings(self, gstr1_chunks: List[int], gstr2_chunks: List[int]) -> List[str]:
-        """Determine suggested filing types based on categorized chunks."""
-        suggestions = []
-        if gstr1_chunks:
-            suggestions.append("GSTR1")
-        if gstr2_chunks:
-            suggestions.append("GSTR2")
-        return suggestions or ["GSTR1"]  # Default to GSTR1
 
     def _calculate_confidence(self, categorizations: List[Dict[str, Any]]) -> float:
         """Calculate overall confidence score."""

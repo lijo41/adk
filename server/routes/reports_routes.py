@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from database.database import get_db
 from auth.dependencies import get_current_active_user
-from schemas.simplified_schemas import UserDB, GSTR1ReturnDB
+from schemas.simplified_schemas import UserDB, GSTR1ReturnDB, GSTR2ReturnDB
 from typing import List, Dict, Any
 import json
 from datetime import datetime
@@ -158,7 +158,7 @@ async def get_gstr1_return_details(
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to fetch GSTR-1 return details: {str(e)}")
+        return {"error": "Failed to get GSTR-1 return details", "details": str(e)}
 
 @reports_router.get("/gstr1/returns/{return_id}/download")
 async def download_gstr1_json(
