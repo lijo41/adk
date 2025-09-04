@@ -20,21 +20,21 @@ const Dashboard: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-cyan-50">
       {/* Header with Company Info */}
-      <div className="border-b bg-card">
+      <div className="border-b bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-6">
             <div>
-              <h1 className="text-3xl font-bold text-foreground">GST Filing Assistant</h1>
+              <h1 className="text-4xl font-bold text-slate-900">GST Filing Assistant</h1>
               {user && (
-                <div className="mt-2 p-4 bg-muted rounded-lg">
-                  <p className="text-lg font-medium">Welcome back, {user.company_name}</p>
-                  <p className="text-sm text-muted-foreground">GSTIN: {user.gstin}</p>
+                <div className="mt-2 p-4 bg-blue-50 border-l-4 border-blue-500 rounded-lg">
+                  <p className="text-lg font-medium text-slate-900">Welcome back, {user.company_name}</p>
+                  <p className="text-sm text-blue-700">GSTIN: {user.gstin}</p>
                 </div>
               )}
             </div>
-            <Button onClick={handleLogout} variant="outline">
+            <Button onClick={handleLogout} variant="outline" className="border-slate-300 text-slate-700 hover:bg-slate-50">
               Logout
             </Button>
           </div>

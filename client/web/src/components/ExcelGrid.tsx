@@ -76,31 +76,31 @@ const ExcelGrid: React.FC<ExcelGridProps> = ({ data, columns, title, onDataChang
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-between items-center">
-        <h3 className="text-lg font-semibold">{title}</h3>
-        <div className="space-x-2">
-          <Button variant="outline" size="sm" onClick={addRow}>
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="text-lg font-semibold text-slate-900">{title}</h3>
+        <div className="flex gap-2">
+          <Button
+            onClick={addRow}
+            size="sm"
+            className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm font-medium"
+          >
             Add Row
           </Button>
         </div>
       </div>
-      
-      <div className="border rounded-lg overflow-hidden">
-        <DataGrid
-          columns={editableColumns}
-          rows={gridData}
-          onRowsChange={handleRowsChange}
-          className="rdg-light"
-          style={{ height: '400px' }}
-          rowKeyGetter={(row: any) => row.id || Math.random()}
-        />
-      </div>
-      
-      {gridData.length > 0 && (
-        <div className="text-sm text-gray-600">
-          Total rows: {gridData.length}
+      <div className="border border-gray-200 rounded-lg overflow-hidden">
+        <div className="h-96">
+          <DataGrid
+            columns={editableColumns}
+            rows={gridData}
+            onRowsChange={handleRowsChange}
+            className="rdg-light"
+          />
         </div>
-      )}
+      </div>
+      <div className="text-sm text-blue-700 mt-2">
+        <p>Total rows: {gridData.length}</p>
+      </div>
     </div>
   );
 };

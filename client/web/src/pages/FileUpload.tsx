@@ -95,12 +95,12 @@ const FileUpload: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-cyan-50 p-6">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Upload Documents</h1>
-          <p className="text-gray-600 mt-2">Upload your GST documents for processing</p>
+          <h1 className="text-4xl font-bold text-slate-900">Upload Documents</h1>
+          <p className="text-lg font-medium text-blue-700 mt-2">Upload your GST documents for processing</p>
         </div>
 
         {/* Progress Steps */}

@@ -77,7 +77,7 @@ const DocUpload: React.FC<DocUploadProps> = ({ onFilesUploaded }) => {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            <div className="border-2 border-dashed border-border rounded-lg p-6 text-center">
+            <div className="border-2 border-dashed border-slate-300 rounded-lg p-6 text-center hover:border-blue-400 transition-colors">
               <input
                 type="file"
                 multiple
@@ -93,10 +93,10 @@ const DocUpload: React.FC<DocUploadProps> = ({ onFilesUploaded }) => {
               >
                 <div className="space-y-2">
                   <div className="text-4xl">📄</div>
-                  <div className="text-lg font-medium">
+                  <div className="text-lg font-medium text-slate-900">
                     {uploading ? 'Uploading...' : 'Click to upload files'}
                   </div>
-                  <div className="text-sm text-muted-foreground">
+                  <div className="text-sm text-slate-600">
                     PDF, Images, Word documents supported
                   </div>
                 </div>
@@ -105,8 +105,8 @@ const DocUpload: React.FC<DocUploadProps> = ({ onFilesUploaded }) => {
             
             {uploading && (
               <div className="text-center">
-                <div className="inline-flex items-center gap-2">
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
+                <div className="inline-flex items-center gap-2 text-blue-700">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
                   Processing files...
                 </div>
               </div>
@@ -139,8 +139,8 @@ const DocUpload: React.FC<DocUploadProps> = ({ onFilesUploaded }) => {
                   className="flex items-center justify-between p-3 border rounded-lg"
                 >
                   <div>
-                    <div className="font-medium">{file.filename}</div>
-                    <div className="text-sm text-muted-foreground">
+                    <div className="font-medium text-slate-900">{file.filename}</div>
+                    <div className="text-sm text-slate-600">
                       {(file.content_length / 1024).toFixed(1)} KB • {file.content_type}
                     </div>
                   </div>

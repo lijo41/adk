@@ -248,7 +248,7 @@ const FilingWizard: React.FC = () => {
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          <div className="border-2 border-dashed border-border rounded-lg p-8 text-center">
+          <div className="border-2 border-dashed border-slate-300 rounded-lg p-8 text-center hover:border-blue-400 transition-colors">
             <input
               type="file"
               multiple
@@ -261,10 +261,10 @@ const FilingWizard: React.FC = () => {
             <label htmlFor="file-upload" className="cursor-pointer block">
               <div className="space-y-2">
                 <div className="text-6xl">📁</div>
-                <div className="text-xl font-medium">
+                <div className="text-xl font-medium text-slate-900">
                   {loading ? 'Uploading...' : 'Drag & drop files here or click to browse'}
                 </div>
-                <div className="text-sm text-muted-foreground">
+                <div className="text-sm text-slate-600">
                   Supported: PDF, Excel, CSV, XML
                 </div>
               </div>
@@ -275,9 +275,9 @@ const FilingWizard: React.FC = () => {
             <div className="space-y-2">
               <h4 className="font-medium">Uploaded Files:</h4>
               {uploadedFiles.map((file, index) => (
-                <div key={index} className="flex items-center justify-between p-2 border rounded">
-                  <span>{file.filename}</span>
-                  <span className="text-green-600">✓</span>
+                <div key={index} className="flex items-center justify-between p-2 border border-slate-200 rounded-lg">
+                  <span className="text-slate-900">{file.filename}</span>
+                  <span className="text-green-600 font-medium">✓</span>
                 </div>
               ))}
             </div>
@@ -439,7 +439,7 @@ const FilingWizard: React.FC = () => {
                   <select 
                     value={filingDetails.gstr1_month}
                     onChange={(e) => setFilingDetails(prev => ({...prev, gstr1_month: e.target.value}))}
-                    className="w-full p-2 border rounded"
+                    className="w-full p-2 border border-slate-300 rounded-lg bg-white text-slate-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                   >
                     <option>March</option>
                     <option>April</option>
@@ -451,7 +451,7 @@ const FilingWizard: React.FC = () => {
                   <select 
                     value={filingDetails.gstr1_year}
                     onChange={(e) => setFilingDetails(prev => ({...prev, gstr1_year: e.target.value}))}
-                    className="w-full p-2 border rounded"
+                    className="w-full p-2 border border-slate-300 rounded-lg bg-white text-slate-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                   >
                     <option>2024</option>
                     <option>2023</option>
@@ -470,7 +470,7 @@ const FilingWizard: React.FC = () => {
                   <select 
                     value={filingDetails.gstr2_month}
                     onChange={(e) => setFilingDetails(prev => ({...prev, gstr2_month: e.target.value}))}
-                    className="w-full p-2 border rounded"
+                    className="w-full p-2 border border-slate-300 rounded-lg bg-white text-slate-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                   >
                     <option>March</option>
                     <option>April</option>
@@ -482,7 +482,7 @@ const FilingWizard: React.FC = () => {
                   <select 
                     value={filingDetails.gstr2_year}
                     onChange={(e) => setFilingDetails(prev => ({...prev, gstr2_year: e.target.value}))}
-                    className="w-full p-2 border rounded"
+                    className="w-full p-2 border border-slate-300 rounded-lg bg-white text-slate-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                   >
                     <option>2024</option>
                     <option>2023</option>
@@ -605,14 +605,16 @@ const FilingWizard: React.FC = () => {
   );
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
-      {renderStepIndicator()}
-      
-      {currentStep === 1 && renderUploadStep()}
-      {currentStep === 2 && renderAnalysisStep()}
-      {currentStep === 3 && renderFilingDetailsStep()}
-      {currentStep === 4 && renderProcessingStep()}
-      {currentStep === 5 && renderReportStep()}
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100">
+      <div className="max-w-4xl mx-auto p-6">
+        {renderStepIndicator()}
+        
+        {currentStep === 1 && renderUploadStep()}
+        {currentStep === 2 && renderAnalysisStep()}
+        {currentStep === 3 && renderFilingDetailsStep()}
+        {currentStep === 4 && renderProcessingStep()}
+        {currentStep === 5 && renderReportStep()}
+      </div>
     </div>
   );
 };

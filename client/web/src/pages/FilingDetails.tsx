@@ -124,12 +124,12 @@ const FilingDetails: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-cyan-50 p-6">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Filing Details</h1>
-          <p className="text-gray-600 mt-2">Configure your GST filing parameters</p>
+          <h1 className="text-4xl font-bold text-slate-900">Filing Details</h1>
+          <p className="text-lg font-medium text-blue-700 mt-2">Configure your GST filing parameters</p>
         </div>
 
         {/* Progress Steps */}
@@ -202,29 +202,29 @@ const FilingDetails: React.FC = () => {
 
               {/* GSTR-1 Details */}
               {selectedFilings.includes('GSTR-1') && (
-                <div className="space-y-4 p-4 border rounded-lg bg-blue-50">
+                <div className="space-y-4 p-4 border border-blue-200 rounded-lg bg-blue-50">
                   <h4 className="font-medium text-blue-900">GSTR-1 Filing Period</h4>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="block text-sm font-medium text-slate-700 mb-1">
                         Start Date
                       </label>
                       <input
                         type="date"
                         value={gstr1Details.startDate}
                         onChange={(e) => setGstr1Details({...gstr1Details, startDate: e.target.value})}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-slate-900"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="block text-sm font-medium text-slate-700 mb-1">
                         End Date
                       </label>
                       <input
                         type="date"
                         value={gstr1Details.endDate}
                         onChange={(e) => setGstr1Details({...gstr1Details, endDate: e.target.value})}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-slate-900"
                       />
                     </div>
                   </div>
