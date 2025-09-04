@@ -123,8 +123,21 @@ const Login: React.FC = () => {
           <div className="w-full max-w-2xl">
             {/* Brand section */}
             <div className="flex items-center mb-16">
-              <div className="w-16 h-16 bg-white/15 backdrop-blur-sm rounded-xl flex items-center justify-center mr-5 border border-white/30">
-                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-16 h-16 bg-white/15 backdrop-blur-sm rounded-xl flex items-center justify-center mr-5 border border-white/30 relative overflow-hidden group">
+                {/* Glass shine effect */}
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent" style={{
+                  animation: 'shine 3s ease-in-out infinite'
+                }}></div>
+                <style dangerouslySetInnerHTML={{
+                  __html: `
+                    @keyframes shine {
+                      0% { transform: translateX(-100%); }
+                      50% { transform: translateX(100%); }
+                      100% { transform: translateX(-100%); }
+                    }
+                  `
+                }} />
+                <svg className="w-8 h-8 text-white relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
               </div>
