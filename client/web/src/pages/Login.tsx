@@ -114,10 +114,10 @@ const Login: React.FC = () => {
   return (
     <div className="min-h-screen flex">
       {/* Left Side - GSTR1 Information - 60% */}
-      <div className="w-3/5 bg-gradient-to-br from-blue-950 via-blue-800 to-slate-900 relative overflow-hidden">
-        {/* Subtle gradient overlay for depth */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-blue-900/30"></div>
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-900/40 via-transparent to-slate-800/20"></div>
+      <div className="w-3/5 relative overflow-hidden" style={{backgroundColor: '#0077B6'}}>
+        {/* Glassmorphism overlay */}
+        <div className="absolute inset-0 bg-gradient-to-br from-white/25 via-white/15 to-blue-400/20 backdrop-blur-sm"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-blue-500/30 via-transparent to-white/20"></div>
         
         <div className="relative z-10 flex items-center h-full px-12 lg:px-16">
           <div className="w-full max-w-2xl">
@@ -164,7 +164,7 @@ const Login: React.FC = () => {
             <div className="space-y-6">
               <div className="flex items-center group">
                 <div className="w-12 h-12 bg-white/15 backdrop-blur-sm rounded-lg flex items-center justify-center mr-5 group-hover:bg-white/25 transition-all duration-300">
-                  <svg className="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-6 h-6 text-blue-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                   </svg>
                 </div>
@@ -174,11 +174,9 @@ const Login: React.FC = () => {
                 </div>
               </div>
               
-          
-              
               <div className="flex items-center group">
                 <div className="w-12 h-12 bg-white/15 backdrop-blur-sm rounded-lg flex items-center justify-center mr-5 group-hover:bg-white/25 transition-all duration-300">
-                  <svg className="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-6 h-6 text-blue-100" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 </div>

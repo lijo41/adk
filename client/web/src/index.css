@@ -14,12 +14,18 @@ body {
   color: #1e293b;
 }
 
-/* Ocean Blue Serenity Theme - Consolidated CSS */
+/* ADK Color Palette - Four Color System */
+:root {
+  --color-primary-light: #00B4D8;    /* Light Blue */
+  --color-primary: #0077B6;          /* Medium Blue */
+  --color-primary-dark: #023E8A;     /* Dark Blue */
+  --color-primary-darkest: #03045E;  /* Darkest Blue */
+}
 
 /* Container styles */
 .container-main {
   min-height: 100vh;
-  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+  background: linear-gradient(135deg, var(--color-primary-light) 0%, var(--color-primary) 100%);
 }
 
 .container-content {
@@ -37,24 +43,24 @@ body {
 .heading-primary {
   font-size: 2.5rem;
   font-weight: bold;
-  color: #0f172a;
+  color: var(--color-primary-darkest);
   margin-bottom: 1rem;
 }
 
 .text-body {
-  color: #475569;
+  color: var(--color-primary-dark);
 }
 
 .text-body-large {
   font-size: 1.125rem;
   font-weight: 500;
-  color: #0369a1;
+  color: var(--color-primary);
 }
 
 /* Loading and Error States */
 .loading-container {
   min-height: 100vh;
-  background-color: #f8fafc;
+  background: linear-gradient(135deg, var(--color-primary-light) 0%, var(--color-primary) 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -70,13 +76,13 @@ body {
   height: 3rem;
   width: 3rem;
   border: 2px solid transparent;
-  border-top: 2px solid #0369a1;
+  border-top: 2px solid var(--color-primary-darkest);
   margin: 0 auto;
 }
 
 .error-container {
   min-height: 100vh;
-  background-color: #f8fafc;
+  background: linear-gradient(135deg, var(--color-primary-light) 0%, var(--color-primary) 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -84,43 +90,49 @@ body {
 
 .error-content {
   text-align: center;
+  color: white;
 }
 
 .error-icon {
-  color: #dc2626;
+  color: var(--color-primary-darkest);
   font-size: 1.25rem;
   margin-bottom: 1rem;
 }
 
-/* Buttons */
+/* Button Styles */
 .btn-ocean-primary {
-  background-color: #0369a1;
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 100%);
   color: white;
-  padding: 0.5rem 1rem;
-  border-radius: 0.375rem;
-  font-weight: 500;
   border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px -1px rgba(0, 119, 182, 0.1), 0 2px 4px -1px rgba(0, 119, 182, 0.06);
 }
 
 .btn-ocean-primary:hover {
-  background-color: #075985;
+  background: linear-gradient(135deg, var(--color-primary-dark) 0%, var(--color-primary) 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 10px 15px -3px rgba(0, 119, 182, 0.1), 0 4px 6px -2px rgba(0, 119, 182, 0.05);
 }
 
-.btn-ocean-success {
-  background-color: #059669;
-  color: white;
-  padding: 0.5rem 1rem;
-  border-radius: 0.375rem;
-  font-weight: 500;
-  border: none;
+.btn-ocean-secondary {
+  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+  color: var(--color-primary-dark);
+  border: 1px solid var(--color-primary-light);
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.3s ease;
 }
 
-.btn-ocean-success:hover {
-  background-color: #047857;
+.btn-ocean-secondary:hover {
+  background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
+  color: var(--color-primary-darkest);
+  transform: translateY(-1px);
 }
 
 /* Stats Components */
@@ -142,36 +154,36 @@ body {
 }
 
 .stat-card-primary {
-  background-color: #dbeafe;
-  border-color: #3b82f6;
+  background-color: rgba(0, 180, 216, 0.1);
+  border-color: var(--color-primary-light);
 }
 
 .stat-card-success {
-  background-color: #d1fae5;
-  border-color: #10b981;
+  background-color: rgba(0, 119, 182, 0.1);
+  border-color: var(--color-primary);
 }
 
 .stat-card-info {
-  background-color: #cffafe;
-  border-color: #06b6d4;
+  background-color: rgba(2, 62, 138, 0.1);
+  border-color: var(--color-primary-dark);
 }
 
 .stat-card-warning {
-  background-color: #fef3c7;
-  border-color: #f59e0b;
+  background-color: rgba(3, 4, 94, 0.1);
+  border-color: var(--color-primary-darkest);
 }
 
 .stat-number {
   font-size: 1.5rem;
   font-weight: bold;
-  color: #0f172a;
+  color: var(--color-primary-darkest);
   margin-bottom: 0.25rem;
 }
 
 .stat-label {
   font-size: 0.875rem;
   font-weight: 500;
-  color: #0369a1;
+  color: var(--color-primary-dark);
 }
 
 /* Card Components */
@@ -200,7 +212,7 @@ body {
 .excel-grid-title {
   font-size: 1.125rem;
   font-weight: 600;
-  color: #0f172a;
+  color: var(--color-primary-darkest);
 }
 
 .excel-grid-actions {
@@ -209,7 +221,7 @@ body {
 }
 
 .excel-grid-container {
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--color-primary-light);
   border-radius: 0.5rem;
   overflow: hidden;
 }
@@ -220,12 +232,12 @@ body {
 
 .excel-grid-footer {
   font-size: 0.875rem;
-  color: #0369a1;
+  color: var(--color-primary);
 }
 
 /* Tab Navigation */
 .tab-nav {
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid var(--color-primary-light);
   margin-bottom: 1.5rem;
 }
 
@@ -245,17 +257,17 @@ body {
 }
 
 .tab-button.active {
-  border-color: #3b82f6;
-  color: #2563eb;
+  border-color: var(--color-primary);
+  color: var(--color-primary-dark);
 }
 
 .tab-button.inactive {
-  color: #6b7280;
+  color: var(--color-primary-light);
 }
 
 .tab-button.inactive:hover {
-  color: #374151;
-  border-color: #d1d5db;
+  color: var(--color-primary);
+  border-color: var(--color-primary-light);
 }
 
 /* Animations */
