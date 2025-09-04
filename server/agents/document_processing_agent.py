@@ -85,6 +85,33 @@ def parse_document_content(file_path: str) -> str:
     except Exception as e:
         return f"Error parsing document: {str(e)}"
 
+def parse_document_content_with_filename(file_path: str, original_filename: str) -> str:
+    """Agent tool: Parse document and extract content using original filename."""
+    if not os.path.exists(file_path):
+        return f"Error: File {file_path} not found"
+    
+    try:
+        # Handle different file types
+        file_ext = Path(file_path).suffix.lower()
+        
+        if file_ext == '.txt':
+            # Direct text file reading
+            with open(file_path, 'r', encoding='utf-8') as f:
+                content = f.read()
+        else:
+            # Use DocumentConverter for other formats
+            converter = DocumentConverter()
+            result = converter.convert(file_path)
+            content = result.document.export_to_markdown()
+        
+        # Store full content and create chunks using original filename
+        document_store["documents"][original_filename] = content
+        document_store["chunks"][original_filename] = chunk_text(content)
+        
+        return f"Successfully parsed {original_filename}. Content length: {len(content)} characters, {len(document_store['chunks'][original_filename])} chunks created"
+    except Exception as e:
+        return f"Error parsing document: {str(e)}"
+
 def summarize_document(filename: str) -> str:
     """Agent tool: Create intelligent summary of document."""
     if filename not in document_store["documents"]:

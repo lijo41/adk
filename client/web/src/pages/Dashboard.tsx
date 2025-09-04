@@ -1,78 +1,153 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button } from '../components/ui/Button.tsx';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/Card.tsx';
-import { useAuthStore } from '../store/authStore.ts';
+import Navbar from '../components/Navbar';
 
 const Dashboard: React.FC = () => {
-  const { user, logout } = useAuthStore();
   const navigate = useNavigate();
 
-  const handleLogout = async () => {
-    try {
-      await logout();
-      navigate('/login');
-    } catch (error) {
-      console.error('Logout error:', error);
-      // Still navigate to login even if logout fails
-      navigate('/login');
-    }
+  const handleTryIt = () => {
+    navigate('/filing/upload');
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-cyan-50">
-      {/* Header with Company Info */}
-      <div className="border-b bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <div>
-              <h1 className="text-4xl font-bold text-slate-900">GST Filing Assistant</h1>
-              {user && (
-                <div className="mt-2 p-4 bg-blue-50 border-l-4 border-blue-500 rounded-lg">
-                  <p className="text-lg font-medium text-slate-900">Welcome back, {user.company_name}</p>
-                  <p className="text-sm text-blue-700">GSTIN: {user.gstin}</p>
-                </div>
-              )}
+    <div className="min-h-screen">
+      <Navbar />
+
+      {/* Hero Section with Login Page Background */}
+      <div className="relative overflow-hidden bg-gradient-to-br from-blue-950 via-blue-800 to-slate-900">
+        {/* Subtle gradient overlay for depth - same as login */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-blue-900/30"></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-900/40 via-transparent to-slate-800/20"></div>
+        
+        
+        <div className="relative z-10 flex items-center justify-between mr-25 h-full px-12 lg:px-16 py-48">
+          <div className="w-full max-w-2xl ml-15">
+            {/* Main heading */}
+            <div className="mb-14 ">
+              <h2 className="text-white text-4xl font-bold mb-6 leading-tight">
+                Streamline GST Filing,
+                <br />
+                <span className="bg-gradient-to-r from-blue-300 via-blue-400 to-blue-500 bg-clip-text text-transparent">
+                  Powered by Finora
+                </span>
+              </h2>
+              
+              <p className="text-white/70 text-lg leading-relaxed font-normal max-w-xl">
+                Transform your GST compliance with AI-powered automation. Upload, process, and file with unprecedented ease.
+              </p>
             </div>
-            <Button onClick={handleLogout} variant="outline" className="border-slate-300 text-slate-700 hover:bg-slate-50">
-              Logout
-            </Button>
+            
+            <button 
+              onClick={handleTryIt}
+              className="px-8 py-4 text-lg font-semibold text-white bg-black rounded-lg transition-all duration-300 hover:bg-gray-900 hover:transform hover:scale-105 shadow-lg cursor-pointer"
+            >
+              TRY IT FREE
+            </button>
+          </div>
+
+          {/* Enhanced AI Robot Illustration   */}
+          <div className="flex justify-center">
+            <div className="relative">
+              {/* Main Robot Container */}
+              <div className="w-74 h-70 bg-white/10 backdrop-blur-sm border border-white/20 rounded-3xl flex items-center justify-center relative overflow-hidden">
+                {/* Glass shine effect */}
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent" style={{
+                  animation: 'shine 4s ease-in-out infinite'
+                }}></div>
+                <style dangerouslySetInnerHTML={{
+                  __html: `
+                    @keyframes shine {
+                      0% { transform: translateX(-100%); }
+                      50% { transform: translateX(100%); }
+                      100% { transform: translateX(-100%); }
+                    }
+                  `
+                }} />
+                
+                {/* Robot Body */}
+                <div className="relative z-10">
+                  <svg className="w-40 h-40 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                </div>
+              </div>
+              
+              {/* Floating Feature Icons */}
+              <div className="absolute -top-6 -left-12 w-16 h-16 bg-black/40 backdrop-blur-sm rounded-xl flex items-center justify-center animate-bounce" style={{animationDelay: '0s', animationDuration: '3s'}}>
+                <svg className="w-8 h-8 text-blue-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              
+              <div className="absolute -top-6 -right-12 w-16 h-16 bg-black/40 backdrop-blur-sm rounded-xl flex items-center justify-center animate-bounce" style={{animationDelay: '1s', animationDuration: '3s'}}>
+                <svg className="w-8 h-8 text-blue-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+              </div>
+              
+              <div className="absolute -bottom-6 -left-12 w-16 h-16 bg-black/40 backdrop-blur-sm  rounded-xl flex items-center justify-center animate-bounce" style={{animationDelay: '2s', animationDuration: '3s'}}>
+                <svg className="w-8 h-8 text-blue-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              
+              <div className="absolute -bottom-6 -right-12 w-16 h-16 bg-black/40 backdrop-blur-sm rounded-xl flex items-center justify-center animate-bounce" style={{animationDelay: '0.5s', animationDuration: '3s'}}>
+                <svg className="w-8 h-8 text-blue-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Main Dashboard Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          
-          {/* Start New Filing Card */}
-          <Card className="cursor-pointer hover:shadow-lg transition-shadow">
-            <CardHeader>
-              <CardTitle>Start New Filing</CardTitle>
-              <CardDescription>
-                Upload documents and create a new GST filing
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button 
-                className="w-full" 
-                onClick={() => navigate('/filing/upload')}
-              >
-                Start Filing Wizard
-              </Button>
-            </CardContent>
-          </Card>
+      {/* Workflow Section */}
+      <div className="py-16 bg-black">
+        <div className="max-w-7xl mx-auto px-12 lg:px-16">
+          <div className="mb-12">
+            <h2 className="text-white text-4xl font-bold leading-tight text-center">
+              Simplifying Your GST Workflow from Start to Finish
+            </h2>
+          </div>
 
-          {/* Previous Filings Card */}
-          <Card className="cursor-pointer hover:shadow-lg transition-shadow">
-            <CardHeader>
-              <div className="flex items-center">
-                <div className="text-4xl mr-4">📊</div>
-                <div>
-                  <CardTitle>Previous Filings</CardTitle>
-                  <CardDescription>
-                    View and manage your filing history
-                  </CardDescription>
+          <div className="space-y-16">
+            {/* Step 1: Document Processing */}
+            <div className="flex items-center justify-between">
+              <div className="flex-1 pr-12">
+                <div className="flex items-center mb-4">
+                  <div className="w-10 h-10 bg-gray-800 text-white rounded-lg flex items-center justify-center font-bold mr-4 text-base">
+                    1
+                  </div>
+                  <h3 className="text-white font-medium text-xl">Document Processing</h3>
+                </div>
+                <p className="text-white/70 text-lg leading-relaxed font-normal   ">
+                  Our Smart AI automatically identifies and processes your GST documents. 
+                  Upload invoices, receipts, and other documents for instant analysis.
+                </p>
+              </div>
+              <div className="flex-1 flex justify-center">
+                <div className="w-64 h-48 bg-blue-500/10 backdrop-blur-sm border border-blue-400/30 rounded-lg flex items-center justify-center relative overflow-hidden">
+                  {/* Glassmorphism shine effect */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-blue-300/20 to-transparent animate-pulse" style={{
+                    animation: 'shine 3s ease-in-out infinite'
+                  }}></div>
+                  
+                  {/* Document stack with blue theme */}
+                  <div className="relative z-10">
+                    <div className="absolute -rotate-12 w-12 h-16 bg-blue-400/40 backdrop-blur-sm rounded-sm border border-blue-300/50 shadow-lg"></div>
+                    <div className="absolute rotate-6 w-12 h-16 bg-blue-500/50 backdrop-blur-sm rounded-sm border border-blue-400/60 translate-x-2 shadow-lg"></div>
+                    <div className="w-12 h-16 bg-blue-600/60 backdrop-blur-sm rounded-sm border border-blue-500/70 translate-x-4 relative z-10 shadow-lg">
+                      <div className="w-full h-0.5 bg-blue-200/60 mt-2 rounded-full"></div>
+                      <div className="w-3/4 h-0.5 bg-blue-200/50 mt-1 rounded-full"></div>
+                      <div className="w-full h-0.5 bg-blue-200/60 mt-1 rounded-full"></div>
+                      <div className="w-2/3 h-0.5 bg-blue-200/50 mt-1 rounded-full"></div>
+                    </div>
+                  </div>
+                  
+                  {/* Animated upload indicator */}
+                  <div className="absolute top-4 right-4">
+                    <div className="w-3 h-3 bg-blue-400 rounded-full animate-ping"></div>
+                  </div>
                 </div>
               </div>
             </CardHeader>

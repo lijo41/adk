@@ -8,7 +8,7 @@ from auth.dependencies import get_current_user
 from schemas.simplified_schemas import UserDB as User
 from usecases.document_usecase import DocumentUseCase
 
-router = APIRouter(prefix="/cleanup", tags=["cleanup"])
+router = APIRouter(prefix="/api/cleanup", tags=["cleanup"])
 
 class ClearChunksRequest(BaseModel):
     document_ids: List[str]
@@ -47,12 +47,17 @@ async def clear_user_session_data(
         document_usecase._chunks.clear()
         document_usecase._documents.clear()
         
-        # 3. Clear GSTR-1 returns from database
+        # 3. Clear global document store from document processing agent
+        from agents.document_processing_agent import document_store
+        document_store["documents"].clear()
+        document_store["chunks"].clear()
+        
+        # 4. Clear GSTR-1 returns from database
         cleared_returns = db.query(GSTR1ReturnDB).filter(
             GSTR1ReturnDB.user_id == current_user.id
         ).delete()
         
-        # 4. Clear any other user-related data from database (if any tables exist)
+        # 5. Clear any other user-related data from database (if any tables exist)
         # Note: Only users and gstr1_returns tables exist in current schema
         
         db.commit()

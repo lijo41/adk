@@ -114,10 +114,10 @@ const Login: React.FC = () => {
   return (
     <div className="min-h-screen flex">
       {/* Left Side - GSTR1 Information - 60% */}
-      <div className="w-3/5 relative overflow-hidden" style={{backgroundColor: '#0077B6'}}>
-        {/* Glassmorphism overlay */}
-        <div className="absolute inset-0 bg-gradient-to-br from-white/25 via-white/15 to-blue-400/20 backdrop-blur-sm"></div>
-        <div className="absolute inset-0 bg-gradient-to-t from-blue-500/30 via-transparent to-white/20"></div>
+      <div className="w-4/5 bg-gradient-to-br from-blue-950 via-blue-800 to-slate-900 relative overflow-hidden">
+        {/* Subtle gradient overlay for depth */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-blue-900/30"></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-900/40 via-transparent to-slate-800/20"></div>
         
         <div className="relative z-10 flex items-center h-full px-12 lg:px-16">
           <div className="w-full max-w-2xl">

@@ -2,7 +2,6 @@ import React, { useState, useMemo } from 'react';
 import { DataGrid } from 'react-data-grid';
 import type { Column, RenderEditCellProps } from 'react-data-grid';
 import 'react-data-grid/lib/styles.css';
-import { Button } from './ui/Button';
 
 interface ExcelGridProps {
   data: any[];
@@ -13,6 +12,11 @@ interface ExcelGridProps {
 
 const ExcelGrid: React.FC<ExcelGridProps> = ({ data, columns, title, onDataChange }) => {
   const [gridData, setGridData] = useState(data);
+
+  // Update gridData when data prop changes
+  React.useEffect(() => {
+    setGridData(data);
+  }, [data]);
 
   const handleRowsChange = (rows: any[]) => {
     setGridData(rows);
@@ -42,7 +46,7 @@ const ExcelGrid: React.FC<ExcelGridProps> = ({ data, columns, title, onDataChang
       editable: true,
       renderEditCell: (props: RenderEditCellProps<any>) => (
         <input
-          className="w-full h-full px-2 border-0 outline-none"
+          className="w-full h-full px-2 border-0 outline-none bg-black/50 text-white"
           value={props.row[props.column.key] || ''}
           onChange={(e) => {
             const newRow = { ...props.row, [props.column.key]: e.target.value };
@@ -63,7 +67,7 @@ const ExcelGrid: React.FC<ExcelGridProps> = ({ data, columns, title, onDataChang
       renderCell: ({ rowIdx }: any) => (
         <button
           onClick={() => deleteRow(rowIdx)}
-          className="w-full h-full flex items-center justify-center text-red-500 hover:text-red-700 hover:bg-red-50 transition-colors"
+          className="w-full h-full flex items-center justify-center text-red-400 hover:text-red-300 hover:bg-red-500/20 transition-colors"
         >
           🗑️
         </button>
@@ -77,28 +81,35 @@ const ExcelGrid: React.FC<ExcelGridProps> = ({ data, columns, title, onDataChang
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center mb-4">
-        <h3 className="text-lg font-semibold text-slate-900">{title}</h3>
+        <h3 className="text-lg font-semibold text-white">{title}</h3>
         <div className="flex gap-2">
-          <Button
+          <button
             onClick={addRow}
-            size="sm"
-            className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm font-medium"
+            className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm font-medium transition-colors"
           >
             Add Row
-          </Button>
+          </button>
         </div>
       </div>
-      <div className="border border-gray-200 rounded-lg overflow-hidden">
+      <div className="border border-white/20 rounded-lg overflow-hidden bg-black/30">
         <div className="h-96">
           <DataGrid
             columns={editableColumns}
             rows={gridData}
             onRowsChange={handleRowsChange}
-            className="rdg-light"
+            className="rdg-dark"
+            style={{
+              '--rdg-color': '#ffffff',
+              '--rdg-background-color': 'rgba(0, 0, 0, 0.3)',
+              '--rdg-header-background-color': 'rgba(0, 0, 0, 0.5)',
+              '--rdg-row-hover-background-color': 'rgba(59, 130, 246, 0.1)',
+              '--rdg-row-selected-background-color': 'rgba(59, 130, 246, 0.2)',
+              '--rdg-border-color': 'rgba(255, 255, 255, 0.2)'
+            } as React.CSSProperties}
           />
         </div>
       </div>
-      <div className="text-sm text-blue-700 mt-2">
+      <div className="text-sm text-blue-300 mt-2">
         <p>Total rows: {gridData.length}</p>
       </div>
     </div>

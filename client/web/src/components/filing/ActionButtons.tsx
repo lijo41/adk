@@ -1,5 +1,4 @@
 import React from 'react';
-import { Button } from '../ui/Button';
 
 interface ActionButtonsProps {
   onBackToDashboard: () => void;
@@ -12,12 +11,18 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
 }) => {
   return (
     <div className="flex justify-center gap-4 mt-8">
-      <Button variant="outline" onClick={onBackToDashboard}>
+      <button 
+        onClick={onBackToDashboard}
+        className="px-6 py-3 border border-white/30 text-white bg-transparent hover:bg-white/10 rounded-lg font-medium transition-colors"
+      >
         ← Back to Dashboard
-      </Button>
-      <Button onClick={onStartNewFiling}>
+      </button>
+      <button 
+        onClick={onStartNewFiling}
+        className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors"
+      >
         Start New Filing
-      </Button>
+      </button>
     </div>
   );
 };

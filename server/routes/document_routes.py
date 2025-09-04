@@ -32,10 +32,10 @@ async def upload_documents(
         
         try:
             # Use document processing agent to parse and chunk
-            from agents.document_processing_agent import parse_document_content, document_store
+            from agents.document_processing_agent import parse_document_content, parse_document_content_with_filename, document_store
             
-            # Parse document content
-            parse_result = parse_document_content(temp_file_path)
+            # Parse document content with original filename
+            parse_result = parse_document_content_with_filename(temp_file_path, file.filename)
             
             if parse_result.startswith("Error"):
                 raise HTTPException(status_code=400, detail=parse_result)

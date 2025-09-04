@@ -46,7 +46,7 @@ export const useAuthStore = create<AuthState>()(
           localStorage.removeItem('token');
           
         } catch (error) {
-          console.error('Error during logout cleanup:', error);
+          console.error('Error during logout cleanup (continuing with local logout):', error);
           // Still proceed with local logout even if backend cleanup fails
           useAppStore.getState().clearAllData();
           set({ token: null, user: null, isAuthenticated: false });

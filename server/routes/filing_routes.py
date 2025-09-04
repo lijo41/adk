@@ -120,14 +120,21 @@ async def process_gstr1_filing(chunks: List[str], gstr1_details: Dict[str, str],
         filtered_indices = filtered_result["filtered_chunks"]
         if not filtered_indices:
             return {
-                "status": "completed",
-                "message": f"No transactions found for {gstr1_details['month']} {gstr1_details['year']}",
+                "status": "no_data",
+                "message": f"No transactions found for the selected date period: {filtered_result['filing_period']}",
                 "filing_period": filtered_result["filing_period"],
-                "total_chunks_analyzed": filtered_result["total_original_chunks"]
+                "total_chunks_analyzed": filtered_result["total_original_chunks"],
+                "error_type": "no_chunks_in_date_range"
             }
         
         # Step 2: Extract GSTR-1 data from filtered chunks
-        filtered_chunks = [chunks[i] for i in filtered_indices]
+        filtered_chunks = [chunks[i] for i in filtered_indices if i < len(chunks)]
+        
+        print(f"Date filtering results:")
+        print(f"- Original chunks: {len(chunks)}")
+        print(f"- Filtered indices: {filtered_indices}")
+        print(f"- Filtered chunks: {len(filtered_chunks)}")
+        print(f"- Filing period: {filtered_result['filing_period']}")
         
         try:
             # Use GSTR-1 extraction agent to process filtered chunks
@@ -154,6 +161,14 @@ async def process_gstr1_filing(chunks: List[str], gstr1_details: Dict[str, str],
             # Add status and message for consistency
             extraction_result["status"] = "completed"
             extraction_result["message"] = f"Successfully processed {len(filtered_chunks)} chunks for GSTR-1 filing and saved to database"
+            
+            # Store filtered chunks info for report access
+            extraction_result["filtered_chunks_info"] = {
+                "total_original_chunks": len(chunks),
+                "filtered_chunk_count": len(filtered_chunks),
+                "filtered_indices": filtered_indices,
+                "filing_period": filtered_result["filing_period"]
+            }
             
         except Exception as e:
             print(f"GSTR-1 extraction error: {e}")

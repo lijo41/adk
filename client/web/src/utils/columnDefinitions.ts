@@ -22,10 +22,18 @@ export const b2clColumns: Column<any>[] = [
   { key: 'invoice_date', name: 'Invoice Date', width: 120 },
   { key: 'invoice_value', name: 'Invoice Value', width: 120 },
   { key: 'place_of_supply', name: 'Place of Supply', width: 120 },
+  { key: 'taxable_value', name: 'Taxable Value', width: 120 },
+  { key: 'igst_amount', name: 'IGST Amount', width: 100 },
+  { key: 'cgst_amount', name: 'CGST Amount', width: 100 },
+  { key: 'sgst_amount', name: 'SGST/UTGST Amount', width: 150 },
+  { key: 'cess_amount', name: 'Cess Amount', width: 100 },
   { key: 'ecommerce_gstin', name: 'E-commerce GSTIN', width: 150 }
 ];
 
 export const b2csColumns: Column<any>[] = [
+  { key: 'invoice_number', name: 'Invoice Number', width: 150 },
+  { key: 'invoice_date', name: 'Invoice Date', width: 120 },
+  { key: 'invoice_value', name: 'Invoice Value', width: 120 },
   { key: 'type', name: 'Type', width: 80 },
   { key: 'place_of_supply', name: 'Place of Supply', width: 120 },
   { key: 'applicable_percent_of_tax_rate', name: 'Applicable % of Tax Rate', width: 180 },

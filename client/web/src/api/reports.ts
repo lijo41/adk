@@ -1,26 +1,26 @@
 import { apiClient } from './client';
-import type { GSTR1Report, GSTR2Report } from '../types';
+import type { GSTR1Return, GSTR2Report } from '../types';
 
 export const reportsApi = {
   /**
    * Get latest GSTR-1 report
    */
-  async getLatestGSTR1(): Promise<GSTR1Report> {
-    return apiClient.get<GSTR1Report>('/reports/gstr1/latest');
+  async getLatestGSTR1(): Promise<GSTR1Return> {
+    return apiClient.get<GSTR1Return>('/reports/gstr1/latest');
   },
 
   /**
    * Get all GSTR-1 reports
    */
-  async getAllGSTR1Reports(): Promise<GSTR1Report[]> {
-    return apiClient.get<GSTR1Report[]>('/reports/gstr1/all');
+  async getAllGSTR1Reports(): Promise<GSTR1Return[]> {
+    return apiClient.get<GSTR1Return[]>('/reports/gstr1/all');
   },
 
   /**
    * Get specific GSTR-1 report by ID
    */
-  async getGSTR1Report(filingId: string): Promise<GSTR1Report> {
-    return apiClient.get<GSTR1Report>(`/reports/gstr1/${filingId}`);
+  async getGSTR1Report(filingId: string): Promise<GSTR1Return> {
+    return apiClient.get<GSTR1Return>(`/reports/gstr1/${filingId}`);
   },
 
   /**

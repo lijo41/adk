@@ -49,7 +49,7 @@ export interface GSTR1Return {
   filing_period: string; // MMYYYY format
   gross_turnover: number;
   status: 'draft' | 'submitted' | 'filed' | 'cancelled';
-  json_data?: string; // Complete GSTR-1 JSON structure
+  json_data?: any; // Complete GSTR-1 JSON structure (parsed object)
   total_invoices: number;
   total_taxable_value: number;
   total_tax: number;
@@ -132,6 +132,16 @@ export interface FilingResponse {
   message?: string;
   gstr1_return?: GSTR1Return;
   gstr2_return?: GSTR2Return;
+  results?: {
+    [key: string]: {
+      status: string;
+      message?: string;
+      error_type?: string;
+      filing_period?: string;
+      total_chunks_analyzed?: number;
+      [key: string]: any;
+    };
+  };
 }
 
 // Report Types
