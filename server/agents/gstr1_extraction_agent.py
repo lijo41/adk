@@ -25,6 +25,7 @@ For each invoice found, extract:
 - invoice_no: Invoice number
 - invoice_date: Date in YYYY-MM-DD format
 - recipient_gstin: Customer GSTIN (15 characters)
+- recipient_name: Customer/Buyer name
 - place_of_supply: State name or code
 - invoice_value: Total invoice amount
 - items: Array of line items with:
@@ -86,6 +87,9 @@ Return ONLY the JSON array, no explanations or other text:"""
             validated['recipient_gstin'] = gstin
         else:
             validated['recipient_gstin'] = None
+            
+        # Validate recipient name
+        validated['recipient_name'] = invoice_data.get('recipient_name', '').strip()
             
         # Validate invoice number
         validated['invoice_no'] = invoice_data.get('invoice_no', '').strip()
@@ -156,6 +160,7 @@ Extract all B2B invoices and return structured data in this exact format:
       "invoice_no": "INV-001",
       "invoice_date": "2025-08-24",
       "recipient_gstin": "32AACCB1122B1ZB",
+      "recipient_name": "ABC Company Ltd",
       "place_of_supply": "Kerala (32)",
       "invoice_value": 13924,
       "items": [

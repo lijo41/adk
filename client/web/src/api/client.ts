@@ -80,11 +80,52 @@ export class ApiClient {
   }
 
   async postFormData<T>(endpoint: string, formData: FormData): Promise<T> {
-    return this.request<T>(endpoint, {
+    const url = `${this.baseUrl}${endpoint}`;
+    const token = getAuthToken();
+
+    const config: RequestInit = {
       method: 'POST',
       body: formData,
-      // Don't set Content-Type for FormData - browser will set it with boundary
-    });
+      headers: {
+        ...(token && { 'Authorization': `Bearer ${token}` }),
+      },
+    };
+
+    try {
+      const response = await fetch(url, config);
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        let errorDetails;
+        try {
+          errorDetails = JSON.parse(errorText);
+        } catch {
+          errorDetails = { message: errorText };
+        }
+
+        throw {
+          message: errorDetails.message || `HTTP ${response.status}`,
+          status: response.status,
+          details: errorDetails,
+        } as ApiError;
+      }
+
+      const contentType = response.headers.get('content-type');
+      if (contentType && contentType.includes('application/json')) {
+        return response.json();
+      }
+
+      return response.text() as unknown as T;
+    } catch (error) {
+      if (error instanceof TypeError && error.message.includes('fetch')) {
+        throw {
+          message: 'Network error - please check your connection',
+          status: 0,
+          details: error,
+        } as ApiError;
+      }
+      throw error;
+    }
   }
 
   /**

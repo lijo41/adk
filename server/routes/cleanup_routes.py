@@ -19,14 +19,18 @@ async def clear_user_session_data(
     document_usecase: DocumentUseCase = Depends()
 ) -> Dict[str, Any]:
     """
-    Clear all user session data including document chunks from memory.
-    Preserves user account data but removes all documents and chunks.
+    Clear all user session data including document chunks from memory and database.
+    Preserves user account data but removes all documents, chunks, and GSTR-1 returns.
     """
     try:
-        # Get all user documents
-        user_documents = document_usecase.get_all_documents()
+        from database.database import get_db
+        from schemas.simplified_schemas import GSTR1ReturnDB
         
-        # Clear all documents and chunks from memory
+        # Get database session
+        db = next(get_db())
+        
+        # 1. Clear all documents and chunks from memory
+        user_documents = document_usecase.get_all_documents()
         cleared_documents = 0
         cleared_chunks = 0
         
@@ -39,10 +43,27 @@ async def clear_user_session_data(
             if document_usecase.delete_document(doc.id):
                 cleared_documents += 1
         
+        # 2. Force clear all chunks from memory storage
+        document_usecase._chunks.clear()
+        document_usecase._documents.clear()
+        
+        # 3. Clear GSTR-1 returns from database
+        cleared_returns = db.query(GSTR1ReturnDB).filter(
+            GSTR1ReturnDB.user_id == current_user.id
+        ).delete()
+        
+        # 4. Clear any other user-related data from database (if any tables exist)
+        # Note: Only users and gstr1_returns tables exist in current schema
+        
+        db.commit()
+        db.close()
+        
         return {
-            "message": f"Session data cleared successfully. Removed {cleared_documents} documents and {cleared_chunks} chunks.",
+            "message": f"Session data cleared successfully. Removed {cleared_documents} documents, {cleared_chunks} chunks, and {cleared_returns} GSTR-1 returns. Memory storage completely cleared.",
             "cleared_documents": cleared_documents,
-            "cleared_chunks": cleared_chunks
+            "cleared_chunks": cleared_chunks,
+            "cleared_returns": cleared_returns,
+            "memory_cleared": True
         }
         
     except Exception as e:

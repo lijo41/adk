@@ -113,9 +113,8 @@ export interface GSTR2Summary {
 // Filing Request Types
 export interface FilingRequest {
   document_ids: string[];
-  session_id: string;
-  filing_types: string[];
-  filing_details: {
+  analysis_session_id: string;
+  filing_types: {
     'GSTR-1'?: {
       start_date: string;
       end_date: string;
@@ -125,7 +124,6 @@ export interface FilingRequest {
       end_date: string;
     };
   };
-  categorization_results?: any;
 }
 
 export interface FilingResponse {

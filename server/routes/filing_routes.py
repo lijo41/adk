@@ -7,7 +7,6 @@ from auth.dependencies import get_current_active_user
 from schemas.simplified_schemas import UserDB
 from agents.date_filtering_agent import DateFilteringAgent
 from agents.gstr1_extraction_agent import GSTR1ExtractionAgent
-from agents.gstr2_extraction_agent import GSTR2ExtractionAgent
 from usecases.shared_instances import get_document_processing_agent
 from typing import List, Dict, Any
 from pydantic import BaseModel
@@ -20,7 +19,6 @@ class FilingRequest(BaseModel):
     document_ids: List[str]
     analysis_session_id: str
     filing_types: Dict[str, Dict[str, str]]  # {"GSTR-1": {"start_date": "2024-01-01", "end_date": "2024-01-31"}}
-    categorization_results: Dict[str, Any] = None  # Add categorization results
 
 @filing_router.post("/submit")
 async def submit_filing(
@@ -52,31 +50,9 @@ async def submit_filing(
         if not all_chunks:
             raise HTTPException(status_code=404, detail="No document chunks found")
         
-        # Extract categorized chunk indices if available
-        gstr1_chunk_indices = []
-        # Route chunks based on categorization results if provided
-        if filing_request.categorization_results:
-            categorization = filing_request.categorization_results
-            
-            # Handle nested categorization structure
-            if "categorization" in categorization:
-                categorization = categorization["categorization"]
-            
-            # Get GSTR-1 relevant chunks
-            gstr1_analysis = categorization.get("gstr1_analysis", {})
-            gstr1_chunk_indices = gstr1_analysis.get("relevant_chunks", [])
-            
-            # Get GSTR-2 relevant chunks  
-            gstr2_analysis = categorization.get("gstr2_analysis", {})
-            gstr2_chunk_indices = gstr2_analysis.get("relevant_chunks", [])
-            
-            print(f"GSTR-1 categorized chunks: {len(gstr1_chunk_indices)}")
-            print(f"GSTR-2 categorized chunks: {len(gstr2_chunk_indices)}")
-        else:
-            print("No categorization results provided - using all chunks for both types")
-            # Fallback: use all chunks for both (old behavior)
-            gstr1_chunk_indices = list(range(len(all_chunks)))
-            gstr2_chunk_indices = list(range(len(all_chunks)))
+        # Use all chunks for GSTR-1 processing (categorization removed)
+        gstr1_chunk_indices = list(range(len(all_chunks)))
+        print(f"Processing all {len(gstr1_chunk_indices)} chunks for GSTR-1")
         
         filing_results = {}
         
@@ -92,17 +68,7 @@ async def submit_filing(
             )
             filing_results["GSTR-1"] = gstr1_result
         
-        # Process GSTR-2 filing if requested
-        if "GSTR-2" in filing_request.filing_types:
-            gstr2_details = filing_request.filing_types.get("GSTR-2", {})
-            # Only pass GSTR-2 categorized chunks
-            gstr2_chunks = [all_chunks[i] for i in gstr2_chunk_indices if i < len(all_chunks)]
-            gstr2_result = await process_gstr2_filing(
-                gstr2_chunks,
-                gstr2_details,
-                current_user
-            )
-            filing_results["GSTR-2"] = gstr2_result
+        # GSTR-2 is now auto-generated, no manual processing needed
         
         return {
             "filing_id": str(uuid.uuid4()),
@@ -299,102 +265,7 @@ async def save_gstr1_to_database(extraction_result: Dict[str, Any], filtered_res
         print(f"❌ Error saving GSTR-1 data to database: {e}")
         raise e
 
-async def process_gstr2_filing(chunks: List[str], gstr2_details: Dict[str, str], user: UserDB) -> Dict[str, Any]:
-    """Process GSTR-2 filing with date filtering."""
-    
-    try:
-        # Step 1: Filter chunks by filing period
-        try:
-            date_agent = DateFilteringAgent()
-            
-            # Check if using custom date range or monthly filing
-            if "start_date" in gstr2_details and "end_date" in gstr2_details:
-                filtered_result = date_agent.filter_chunks_by_period(
-                    chunks=chunks,
-                    start_date=gstr2_details["start_date"],
-                    end_date=gstr2_details["end_date"]
-                )
-            else:
-                filtered_result = date_agent.filter_chunks_by_period(
-                    chunks=chunks,
-                    filing_month=gstr2_details.get("month"),
-                    filing_year=gstr2_details.get("year")
-                )
-        except Exception as e:
-            print(f"Date filtering error: {e}")
-            # Fallback: use all chunks
-            filtered_result = {
-                "filtered_chunks": list(range(len(chunks))),
-                "filing_period": "All chunks (fallback)",
-                "total_original_chunks": len(chunks),
-                "total_filtered_chunks": len(chunks),
-                "notes": f"Date filtering failed, using all chunks: {str(e)}"
-            }
-        
-        if "error" in filtered_result:
-            return {"status": "error", "message": filtered_result["error"]}
-        
-        # Get filtered chunk indices
-        filtered_indices = filtered_result["filtered_chunks"]
-        if not filtered_indices:
-            return {
-                "status": "completed",
-                "message": f"No transactions found for {gstr2_details.get('month', 'N/A')} {gstr2_details.get('year', 'N/A')}",
-                "filing_period": filtered_result["filing_period"],
-                "total_chunks_analyzed": filtered_result["total_original_chunks"]
-            }
-        
-        # Step 2: Extract GSTR-2 data from filtered chunks
-        filtered_chunks = [chunks[i] for i in filtered_indices]
-        
-        try:
-            # Use GSTR-2 extraction agent to process filtered chunks
-            import os
-            api_key = os.getenv("GOOGLE_API_KEY")
-            if not api_key:
-                raise ValueError("GOOGLE_API_KEY not found in environment variables")
-            
-            gstr2_agent = GSTR2ExtractionAgent()
-            filing_period = f"{gstr2_details.get('month', '')} {gstr2_details.get('year', '')}"
-            extraction_result = gstr2_agent.extract_gstr2_data(
-                chunks=filtered_chunks,
-                filing_period=filing_period,
-                user=user
-            )
-            
-            # Add status and message for consistency
-            extraction_result["status"] = "completed"
-            extraction_result["message"] = f"Successfully processed {len(filtered_chunks)} chunks for GSTR-2 filing"
-            
-        except Exception as e:
-            print(f"GSTR-2 extraction error: {e}")
-            # Fallback to basic result
-            extraction_result = {
-                "status": "completed",
-                "total_invoices": len(filtered_chunks),
-                "inward_invoices": [],
-                "total_taxable_value": 0.0,
-                "total_tax_amount": 0.0,
-                "message": f"Processed {len(filtered_chunks)} chunks (extraction failed: {str(e)})"
-            }
-        
-        return {
-            "status": "completed",
-            "filing_period": filtered_result["filing_period"],
-            "date_filtering": {
-                "total_chunks_analyzed": filtered_result["total_original_chunks"],
-                "filtered_chunks_count": filtered_result["total_filtered_chunks"],
-                "notes": filtered_result.get("notes", "")
-            },
-            "gstr2_extraction": extraction_result,
-            "user_id": user.id
-        }
-        
-    except Exception as e:
-        return {
-            "status": "error",
-            "message": f"GSTR-2 processing failed: {str(e)}"
-        }
+# GSTR-2 processing function removed - GSTR-2 is now auto-generated
 
 @filing_router.get("/status/{filing_id}")
 async def get_filing_status(

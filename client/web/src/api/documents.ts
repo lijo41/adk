@@ -14,23 +14,38 @@ export interface AnalysisRequest {
 
 export interface AnalysisResponse {
   session_id: string;
-  gstr1_analysis: {
-    relevant_chunks: number[];
-    outward_supply_count: number;
-    total_transactions: number;
-  };
-  gstr2_analysis: {
-    relevant_chunks: number[];
-    inward_supply_count: number;
-    total_transactions: number;
-  };
-  categorization_summary: {
-    total_chunks: number;
-    gstr1_chunks: number;
-    gstr2_chunks: number;
-    irrelevant_chunks: number;
-    ambiguous_chunks_processed: number;
-    overall_confidence: number;
+  status: string;
+  processed_documents: string[];
+  total_chunks: number;
+  user_id: string;
+  categorization: {
+    gstr1_analysis: {
+      relevant_chunks: number[];
+      outward_supply_count: number;
+      total_transactions: number;
+    };
+    gstr2_analysis: {
+      relevant_chunks: number[];
+      inward_supply_count: number;
+      total_transactions: number;
+    };
+    categorization_summary: {
+      total_chunks: number;
+      gstr1_chunks: number;
+      gstr2_chunks: number;
+      irrelevant_chunks: number;
+      ambiguous_chunks_processed: number;
+      overall_confidence: number;
+    };
+    chunk_categorization: Array<{
+      chunk_index: number;
+      category: string;
+      confidence: number;
+      detected_data_types: string[];
+      method: string;
+    }>;
+    chunk_metadata: any[];
+    document_breakdown: Record<string, any>;
   };
 }
 

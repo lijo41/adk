@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from database.database import get_db
 from auth.dependencies import get_current_active_user
-from schemas.simplified_schemas import UserDB, GSTR1ReturnDB, GSTR2ReturnDB
+from schemas.simplified_schemas import UserDB, GSTR1ReturnDB
 from typing import List, Dict, Any
 import json
 from datetime import datetime
@@ -38,7 +38,9 @@ async def get_latest_gstr1_return(
             except:
                 pass
         
-        # Extract summary data from JSON (no separate summary table in simplified schema)
+        # Extract invoice details from JSON
+        extraction_result = json_data.get("extraction_result", {})
+        invoices_data = extraction_result.get("invoices", [])
         
         return {
             "filing_id": latest_return.id,
@@ -55,6 +57,7 @@ async def get_latest_gstr1_return(
                         "b2b_invoices": int(latest_return.total_invoices or 0),
                         "total_taxable_value": float(latest_return.total_taxable_value or 0),
                         "total_tax_amount": float(latest_return.total_tax or 0),
+                        "invoices": invoices_data,
                         "message": f"Successfully processed {int(latest_return.total_invoices or 0)} invoices"
                     }
                 }

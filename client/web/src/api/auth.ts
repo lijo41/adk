@@ -46,12 +46,12 @@ export const authApi = {
   },
 
   async getProfile(): Promise<User> {
-    const response = await apiClient.get('/auth/profile');
+    const response = await apiClient.get<User>('/auth/me');
     return response.data;
   },
 
   async updateProfile(profileData: Partial<Pick<User, 'full_name' | 'phone' | 'company_name'>>): Promise<User> {
-    const response = await apiClient.put('/auth/profile', profileData);
+    const response = await apiClient.put('/auth/me', profileData);
     return response.data;
   },
 

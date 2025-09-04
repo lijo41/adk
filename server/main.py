@@ -12,7 +12,6 @@ from routes.document_routes import document_router
 from routes.chat_routes import chat_router
 from routes.gstr1_routes import gstr1_router
 from routes.auth_routes import auth_router
-from routes.categorization_routes import categorization_router
 from routes.filing_routes import filing_router
 from routes.reports_routes import reports_router
 from routes.cleanup_routes import router as cleanup_router
@@ -74,7 +73,6 @@ app.include_router(auth_router)
 app.include_router(document_router)
 app.include_router(chat_router)
 app.include_router(gstr1_router)
-app.include_router(categorization_router)
 app.include_router(filing_router)
 app.include_router(reports_router)
 app.include_router(cleanup_router)

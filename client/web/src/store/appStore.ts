@@ -1,22 +1,15 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
 
-// Types for our store
+// Types for our store (GSTR-1 only, GSTR-2 is auto-generated)
 interface AnalysisResult {
   gstr1_analysis: {
     relevant_chunks: number[];
     outward_supply_count: number;
     total_transactions: number;
   };
-  gstr2_analysis: {
-    relevant_chunks: number[];
-    inward_supply_count: number;
-    total_transactions: number;
-  };
   categorization_summary: {
     total_chunks: number;
     gstr1_chunks: number;
-    gstr2_chunks: number;
     irrelevant_chunks: number;
     ambiguous_chunks_processed: number;
     overall_confidence: number;
@@ -24,7 +17,6 @@ interface AnalysisResult {
   document_breakdown?: {
     [filename: string]: {
       gstr1_chunks: number[];
-      gstr2_chunks: number[];
       irrelevant_chunks: number[];
       total_chunks: number;
     };
@@ -68,101 +60,94 @@ interface AppState {
   clearAllData: () => void;
 }
 
-export const useAppStore = create<AppState>()(
-  persist(
-    (set) => ({
-      // Initial state
+export const useAppStore = create<AppState>()((set) => ({
+  // Initial state
+  uploadedDocIds: [],
+  analysisSessionId: null,
+  analysisData: null,
+  filingId: null,
+  filingResult: null,
+  isLoading: false,
+
+  // Document upload actions
+  setUploadedDocIds: (ids: string[]) => 
+    set({ uploadedDocIds: ids }),
+  
+  clearUploadedDocIds: () => 
+    set({ uploadedDocIds: [] }),
+
+  // Analysis actions
+  setAnalysisData: (data: AnalysisResult, sessionId?: string) => 
+    set({ 
+      analysisData: data, 
+      analysisSessionId: sessionId || null
+    }),
+  
+  clearAnalysisData: () => 
+    set({ 
+      analysisData: null, 
+      analysisSessionId: null 
+    }),
+
+  // Filing actions
+  setFilingResult: (result: FilingResult) => 
+    set({ 
+      filingResult: result, 
+      filingId: result.filing_id 
+    }),
+  
+  clearFilingResult: () => 
+    set({ 
+      filingResult: null, 
+      filingId: null 
+    }),
+
+  // UI actions
+  setIsLoading: (loading: boolean) => 
+    set({ isLoading: loading }),
+
+  // Clear all data
+  clearAllData: () => 
+    set({
       uploadedDocIds: [],
       analysisSessionId: null,
       analysisData: null,
       filingId: null,
       filingResult: null,
-      isLoading: false,
-
-      // Document upload actions
-      setUploadedDocIds: (ids: string[]) => 
-        set({ uploadedDocIds: ids }),
-      
-      clearUploadedDocIds: () => 
-        set({ uploadedDocIds: [] }),
-
-      // Analysis actions
-      setAnalysisData: (data: AnalysisResult, sessionId?: string) => 
-        set({ 
-          analysisData: data, 
-          analysisSessionId: sessionId || null
-        }),
-      
-      clearAnalysisData: () => 
-        set({ 
-          analysisData: null, 
-          analysisSessionId: null 
-        }),
-
-      // Filing actions
-      setFilingResult: (result: FilingResult) => 
-        set({ 
-          filingResult: result, 
-          filingId: result.filing_id 
-        }),
-      
-      clearFilingResult: () => 
-        set({ 
-          filingResult: null, 
-          filingId: null 
-        }),
-
-      // UI actions
-      setIsLoading: (loading: boolean) => 
-        set({ isLoading: loading }),
-
-      // Clear all data
-      clearAllData: () => 
-        set({
-          uploadedDocIds: [],
-          analysisSessionId: null,
-          analysisData: null,
-          filingId: null,
-          filingResult: null,
-          isLoading: false
-        })
-    }),
-    {
-      name: 'adk-app-storage', // localStorage key
-      // Only persist essential data, not UI state
-      partialize: (state) => ({
-        uploadedDocIds: state.uploadedDocIds,
-        analysisSessionId: state.analysisSessionId,
-        analysisData: state.analysisData,
-        filingId: state.filingId,
-        filingResult: state.filingResult
-      })
-    }
-  )
-);
+      isLoading: false
+    })
+}));
 
 // Selectors for better performance
-export const useUploadedDocs = () => useAppStore(state => ({
-  uploadedDocIds: state.uploadedDocIds,
-  setUploadedDocIds: state.setUploadedDocIds,
-  clearUploadedDocIds: state.clearUploadedDocIds
-}));
+export const useUploadedDocs = () => {
+  const uploadedDocIds = useAppStore(state => state.uploadedDocIds);
+  const setUploadedDocIds = useAppStore(state => state.setUploadedDocIds);
+  const clearUploadedDocIds = useAppStore(state => state.clearUploadedDocIds);
+  
+  return { uploadedDocIds, setUploadedDocIds, clearUploadedDocIds };
+};
 
-export const useAnalysis = () => useAppStore(state => ({
-  analysisData: state.analysisData,
-  analysisSessionId: state.analysisSessionId,
-  setAnalysisData: state.setAnalysisData,
-  clearAnalysisData: state.clearAnalysisData
-}));
+export const useAnalysis = () => {
+  const analysisData = useAppStore(state => state.analysisData);
+  const analysisSessionId = useAppStore(state => state.analysisSessionId);
+  const setAnalysisData = useAppStore(state => state.setAnalysisData);
+  const clearAnalysisData = useAppStore(state => state.clearAnalysisData);
+  
+  return { analysisData, analysisSessionId, setAnalysisData, clearAnalysisData };
+};
 
-export const useFiling = () => useAppStore(state => ({
-  filingResult: state.filingResult,
-  filingId: state.filingId,
-  setFilingResult: state.setFilingResult,
-  clearFilingResult: state.clearFilingResult
-}));
+export const useFiling = () => {
+  const filingResult = useAppStore(state => state.filingResult);
+  const filingId = useAppStore(state => state.filingId);
+  const setFilingResult = useAppStore(state => state.setFilingResult);
+  const clearFilingResult = useAppStore(state => state.clearFilingResult);
+  
+  return { filingResult, filingId, setFilingResult, clearFilingResult };
+};
 
-export const useUI = () => useAppStore(state => ({
-  isLoading: state.isLoading,
-  setIsLoading: state.setIsLoading
-}));
+export const useUI = () => {
+  const isLoading = useAppStore(state => state.isLoading);
+  const setIsLoading = useAppStore(state => state.setIsLoading);
+  
+  return { isLoading, setIsLoading };
+};

@@ -3,12 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/Button.tsx';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/Card.tsx';
 import { toast } from 'react-hot-toast';
-import { useAnalysis, useFiling } from '../store/appStore';
+import { useUploadedDocs, useFiling } from '../store/appStore';
 import { filingApi } from '../api';
 
 const FilingDetails: React.FC = () => {
   const navigate = useNavigate();
-  const { analysisData } = useAnalysis();
+  const { uploadedDocIds } = useUploadedDocs();
   const { setFilingResult } = useFiling();
   
   const [selectedFilings, setSelectedFilings] = useState<string[]>(['GSTR-1']);
@@ -16,31 +16,18 @@ const FilingDetails: React.FC = () => {
     startDate: '',
     endDate: ''
   });
-  const [gstr2Details, setGstr2Details] = useState({
-    startDate: '',
-    endDate: ''
-  });
   const [isProcessing, setIsProcessing] = useState(false);
   const [processingStep, setProcessingStep] = useState('');
 
-  // Check if we have analysis data from Zustand store
+  // Check if we have uploaded documents
   useEffect(() => {
-    if (analysisData) {
-      console.log('Loaded analysis data for filing:', analysisData);
-        
-      // Display analysis results to user
-      if (analysisData.gstr1_analysis) {
-        console.log('GSTR-1 Analysis Results:', {
-          outward_supply_count: analysisData.gstr1_analysis.outward_supply_count,
-          total_transactions: analysisData.gstr1_analysis.total_transactions,
-          relevant_chunks: analysisData.gstr1_analysis.relevant_chunks.length
-        });
-      }
+    if (!uploadedDocIds || uploadedDocIds.length === 0) {
+      console.log('No uploaded documents found, redirecting to upload');
+      navigate('/filing/upload');
     } else {
-      // No analysis data available, redirect back to analysis
-      navigate('/filing/analysis');
+      console.log('Found uploaded documents:', uploadedDocIds);
     }
-  }, [analysisData, navigate]);
+  }, [uploadedDocIds, navigate]);
 
   const handleSubmit = async () => {
     if (selectedFilings.includes('GSTR-1') && (!gstr1Details.startDate || !gstr1Details.endDate)) {
@@ -48,10 +35,6 @@ const FilingDetails: React.FC = () => {
       return;
     }
     
-    if (selectedFilings.includes('GSTR-2') && (!gstr2Details.startDate || !gstr2Details.endDate)) {
-      toast.error('Please provide start and end dates for GSTR-2');
-      return;
-    }
     
     if (selectedFilings.length === 0) {
       toast.error('Please select at least one filing type');
@@ -62,29 +45,16 @@ const FilingDetails: React.FC = () => {
     setProcessingStep('Initializing...');
 
     try {
-      // Get stored data from previous steps
-      const uploadedDocIds = JSON.parse(sessionStorage.getItem('uploadedDocIds') || '[]');
-      const analysisSessionId = sessionStorage.getItem('analysisSessionId') || '';
-
       // Debug logging
       console.log('Filing submission data:');
       console.log('- Document IDs:', uploadedDocIds);
-      console.log('- Analysis Session ID:', analysisSessionId);
-      console.log('- Analysis Data:', analysisData);
-      console.log('- Categorization Results:', analysisData?.categorization_summary);
+      console.log('- Filing Types:', selectedFilings);
 
       // Validate session data
       if (!uploadedDocIds.length) {
-        console.error('No uploaded documents found in session');
+        console.error('No uploaded documents found');
         toast.error('No documents found. Please upload documents first.');
         navigate('/filing/upload');
-        return;
-      }
-
-      if (!analysisSessionId) {
-        console.error('No analysis session found');
-        toast.error('Analysis session not found. Please run analysis first.');
-        navigate('/filing/analysis');
         return;
       }
 
@@ -115,23 +85,15 @@ const FilingDetails: React.FC = () => {
       // Submit filing request using centralized API
       const filingRequest = {
         document_ids: uploadedDocIds,
-        session_id: analysisSessionId || '',
-        filing_types: selectedFilings,
-        filing_details: {
+        analysis_session_id: 'direct-upload-session',
+        filing_types: {
           ...(selectedFilings.includes('GSTR-1') ? {
             'GSTR-1': {
               start_date: gstr1Details.startDate,
               end_date: gstr1Details.endDate
             }
           } : {}),
-          ...(selectedFilings.includes('GSTR-2') ? {
-            'GSTR-2': {
-              start_date: gstr2Details.startDate,
-              end_date: gstr2Details.endDate
-            }
-          } : {})
-        },
-        categorization_results: analysisData?.categorization_summary || {}
+        }
       };
 
       const result = await filingApi.submitFiling(filingRequest);
@@ -174,41 +136,24 @@ const FilingDetails: React.FC = () => {
         <div className="mb-8">
           <div className="flex items-center justify-between">
             <div className="flex items-center">
-              <div className="flex items-center justify-center w-8 h-8 bg-green-500 text-white rounded-full text-sm font-medium">
+              <div className="w-8 h-8 bg-green-600 text-white rounded-full flex items-center justify-center text-sm font-medium">
                 ✓
               </div>
-              <span className="ml-2 text-sm text-gray-500">Upload Documents</span>
+              <span className="ml-2 text-sm font-medium text-green-600">Upload Documents</span>
             </div>
-            <div className="flex-1 h-px bg-green-500 mx-4"></div>
+            <div className="flex-1 mx-4 h-0.5 bg-green-600"></div>
             <div className="flex items-center">
-              <div className="flex items-center justify-center w-8 h-8 bg-green-500 text-white rounded-full text-sm font-medium">
-                ✓
+              <div className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-medium">
+                2
               </div>
-              <span className="ml-2 text-sm text-gray-500">Smart Analysis</span>
+              <span className="ml-2 text-sm font-medium text-blue-600">GST Filing</span>
             </div>
-            <div className="flex-1 h-px bg-green-500 mx-4"></div>
+            <div className="flex-1 mx-4 h-0.5 bg-gray-200"></div>
             <div className="flex items-center">
-              <div className="flex items-center justify-center w-8 h-8 bg-blue-500 text-white rounded-full text-sm font-medium">
-                {isProcessing ? (
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                ) : (
-                  '3'
-                )}
+              <div className="w-8 h-8 bg-gray-200 text-gray-500 rounded-full flex items-center justify-center text-sm font-medium">
+                3
               </div>
-              <span className="ml-2 text-sm text-blue-600 font-medium">
-                {isProcessing ? 'Processing...' : 'GST Filing'}
-              </span>
-            </div>
-            <div className={`flex-1 h-px mx-4 ${isProcessing ? 'bg-blue-500' : 'bg-gray-300'}`}></div>
-            <div className="flex items-center">
-              <div className={`flex items-center justify-center w-8 h-8 rounded-full text-sm font-medium ${
-                isProcessing ? 'bg-blue-500 text-white' : 'bg-gray-300 text-gray-500'
-              }`}>
-                4
-              </div>
-              <span className={`ml-2 text-sm ${isProcessing ? 'text-blue-600' : 'text-gray-500'}`}>
-                Report
-              </span>
+              <span className="ml-2 text-sm text-gray-500">Report</span>
             </div>
           </div>
         </div>
@@ -228,8 +173,7 @@ const FilingDetails: React.FC = () => {
                 <h3 className="text-lg font-medium">Filing Types</h3>
                 <div className="space-y-3">
                   {[
-                    { id: 'GSTR-1', name: 'GSTR-1', description: 'Outward supplies of taxable goods and/or services' },
-                    { id: 'GSTR-2', name: 'GSTR-2', description: 'Inward supplies from registered suppliers' }
+                    { id: 'GSTR-1', name: 'GSTR-1', description: 'Outward supplies of taxable goods and/or services' }
                   ].map((filing) => (
                     <div key={filing.id} className="flex items-start space-x-3">
                       <input
@@ -287,36 +231,6 @@ const FilingDetails: React.FC = () => {
                 </div>
               )}
 
-              {/* GSTR-2 Details */}
-              {selectedFilings.includes('GSTR-2') && (
-                <div className="space-y-4 p-4 border rounded-lg bg-green-50">
-                  <h4 className="font-medium text-green-900">GSTR-2 Filing Period</h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Start Date
-                      </label>
-                      <input
-                        type="date"
-                        value={gstr2Details.startDate}
-                        onChange={(e) => setGstr2Details({...gstr2Details, startDate: e.target.value})}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        End Date
-                      </label>
-                      <input
-                        type="date"
-                        value={gstr2Details.endDate}
-                        onChange={(e) => setGstr2Details({...gstr2Details, endDate: e.target.value})}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                      />
-                    </div>
-                  </div>
-                </div>
-              )}
             </CardContent>
           </Card>
 

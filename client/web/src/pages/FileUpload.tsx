@@ -53,18 +53,32 @@ const FileUpload: React.FC = () => {
           const result = await documentsApi.uploadDocument(actualFile);
           uploadedDocIds.push(result.document_id);
           console.log(`Uploaded ${actualFile.name}:`, result.document_id);
-        } catch (fileError) {
+        } catch (fileError: any) {
           console.error(`File upload error for ${actualFile.name}:`, fileError);
+          
+          // Handle specific 422 error with better messaging
+          if (fileError?.status === 422) {
+            const details = fileError.details?.detail;
+            if (Array.isArray(details)) {
+              const fieldErrors = details.map((err: any) => `${err.loc?.join('.')}: ${err.msg}`).join(', ');
+              throw new Error(`Validation error: ${fieldErrors}`);
+            } else if (details) {
+              throw new Error(`Validation error: ${details}`);
+            } else {
+              throw new Error('File validation failed - please check file format and try again');
+            }
+          }
+          
           throw fileError;
         }
       }
       
       toast.success(`${uploadedDocIds.length} files processed successfully!`);
       setUploadedDocIds(uploadedDocIds);
-      navigate('/filing/analysis');
+      navigate('/filing/details');
       
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Please check your files and try again.';
+    } catch (error: any) {
+      const errorMessage = error?.message || 'Please check your files and try again.';
       toast.error(`Upload failed: ${errorMessage}`);
       console.error('Upload error:', error);
     } finally {
@@ -103,19 +117,12 @@ const FileUpload: React.FC = () => {
               <div className="w-8 h-8 bg-gray-200 text-gray-500 rounded-full flex items-center justify-center text-sm font-medium">
                 2
               </div>
-              <span className="ml-2 text-sm text-gray-500">Smart Analysis</span>
-            </div>
-            <div className="flex-1 mx-4 h-0.5 bg-gray-200"></div>
-            <div className="flex items-center">
-              <div className="w-8 h-8 bg-gray-200 text-gray-500 rounded-full flex items-center justify-center text-sm font-medium">
-                3
-              </div>
               <span className="ml-2 text-sm text-gray-500">GST Filing</span>
             </div>
             <div className="flex-1 mx-4 h-0.5 bg-gray-200"></div>
             <div className="flex items-center">
               <div className="w-8 h-8 bg-gray-200 text-gray-500 rounded-full flex items-center justify-center text-sm font-medium">
-                4
+                3
               </div>
               <span className="ml-2 text-sm text-gray-500">Report</span>
             </div>

@@ -35,7 +35,6 @@ class UserDB(Base):
     
     # Relationships
     gstr1_returns = relationship("GSTR1ReturnDB", back_populates="user")
-    gstr2_returns = relationship("GSTR2ReturnDB", back_populates="user")
 
 
 class GSTR1ReturnDB(Base):
@@ -71,47 +70,6 @@ class GSTR1ReturnDB(Base):
     user = relationship("UserDB", back_populates="gstr1_returns")
 
 
-class GSTR2ReturnDB(Base):
-    """GSTR-2 Return table for inward supplies (purchases)."""
-    __tablename__ = "gstr2_returns"
-    
-    id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
-    user_id = Column(String, ForeignKey("users.id"), nullable=False, index=True)
-    
-    # Header details
-    gstin = Column(String(15), nullable=False, index=True)  # Buyer GSTIN
-    company_name = Column(String(255), nullable=False)  # Buyer company
-    filing_period = Column(String(6), nullable=False, index=True)  # MMYYYY
-    status = Column(String(20), default="draft", index=True)
-    
-    # Complete JSON data storage
-    json_data = Column(Text)  # Stores complete GSTR-2 JSON structure
-    
-    # Summary fields for quick queries and reporting
-    total_invoices = Column(Numeric(10, 0), default=0)
-    total_taxable_value = Column(Numeric(15, 2), default=0)
-    total_tax = Column(Numeric(15, 2), default=0)
-    total_invoice_value = Column(Numeric(15, 2), default=0)
-    
-    # GSTR-2 specific fields
-    total_itc_claimed = Column(Numeric(15, 2), default=0)  # Input Tax Credit
-    total_cgst_itc = Column(Numeric(15, 2), default=0)
-    total_sgst_itc = Column(Numeric(15, 2), default=0)
-    total_igst_itc = Column(Numeric(15, 2), default=0)
-    total_cess_itc = Column(Numeric(15, 2), default=0)
-    
-    # Supplier analysis
-    unique_suppliers = Column(Numeric(10, 0), default=0)
-    reverse_charge_invoices = Column(Numeric(10, 0), default=0)
-    import_invoices = Column(Numeric(10, 0), default=0)
-    
-    # Timestamps
-    created_at = Column(DateTime, default=datetime.utcnow, index=True)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-    submitted_at = Column(DateTime)  # When submitted to tax authorities
-    
-    # Relationships
-    user = relationship("UserDB", back_populates="gstr2_returns")
 
 
 # Relationships are already defined in the class definitions above
