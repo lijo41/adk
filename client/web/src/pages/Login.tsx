@@ -215,7 +215,7 @@ const Login: React.FC = () => {
                     WebkitTextFillColor: 'white',
                     caretColor: '#3b82f6'
                   }}
-                  placeholder="Email address"
+                  placeholder="Username"
                 />
                 {errors.username && (
                   <p className="mt-1 text-sm text-red-500">{errors.username}</p>
