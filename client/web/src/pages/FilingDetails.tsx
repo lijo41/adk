@@ -5,6 +5,7 @@ import { useUploadedDocs, useFiling } from '../store/appStore';
 import { filingApi } from '../api';
 import Navbar from '../components/Navbar';
 import DatePicker from '../components/ui/DatePicker';
+import { FloatingChatBot } from '../components/FloatingChatBot';
 
 const FilingDetails: React.FC = () => {
   const navigate = useNavigate();
@@ -281,6 +282,7 @@ const FilingDetails: React.FC = () => {
         </div>
         </div>
       </div>
+      <FloatingChatBot />
     </div>
   );
 };

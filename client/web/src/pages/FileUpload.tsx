@@ -4,6 +4,7 @@ import { toast } from 'react-hot-toast';
 import { useUploadedDocs, useFiling, useAppStore } from '../store/appStore';
 import { documentsApi, cleanupApi } from '../api';
 import Navbar from '../components/Navbar';
+import { FloatingChatBot } from '../components/FloatingChatBot';
 
 interface UploadedFile extends File {
   id: string;
@@ -304,6 +305,7 @@ const FileUpload: React.FC = () => {
         </div>
         </div>
       </div>
+      <FloatingChatBot />
     </div>
   );
 };

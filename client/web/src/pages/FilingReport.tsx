@@ -7,6 +7,7 @@ import ActionButtons from '../components/filing/ActionButtons';
 import { useFilingData } from '../hooks/useFilingData';
 import { downloadCompleteExcel } from '../utils/excelExport';
 import { b2bColumns, b2clColumns, b2csColumns, hsnColumns } from '../utils/columnDefinitions';
+import { FloatingChatBot } from '../components/FloatingChatBot';
 
 const FilingReport: React.FC = () => {
   const navigate = useNavigate();
@@ -159,6 +160,7 @@ const FilingReport: React.FC = () => {
           </div>
         </div>
       </div>
+      <FloatingChatBot />
     </div>
   );
 };

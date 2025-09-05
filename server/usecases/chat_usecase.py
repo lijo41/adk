@@ -4,8 +4,7 @@ import uuid
 from datetime import datetime
 from typing import List, Dict, Any, Optional
 import google.generativeai as genai
-
-# Document models removed - processing in-memory only
+from agents.document_processing_agent import document_store
 
 
 class ChatUseCase:
@@ -52,8 +51,33 @@ Provide a detailed summary that will help with future questions:"""
         if not chunks:
             return []
         
-        # Simplified chunk processing - no document storage
-        return []
+        # Use AI to find relevant chunks
+        relevant_chunks = []
+        for i, chunk in enumerate(chunks):
+            if len(chunk.strip()) < 50:  # Skip very short chunks
+                continue
+                
+            prompt = f"""Question: "{question}"
+
+Does this text chunk contain information that could help answer the question? 
+Consider partial matches and related content. Answer YES or NO.
+
+Chunk: {chunk[:800]}
+
+Relevant:"""
+            
+            try:
+                response = self.model.generate_content(prompt)
+                if "YES" in response.text.upper():
+                    relevant_chunks.append(chunk)
+                    
+                # Limit to top 3 chunks to avoid token limits
+                if len(relevant_chunks) >= 3:
+                    break
+            except:
+                continue
+        
+        return relevant_chunks
     
     def extract_context_for_query(self, question: str, content: str) -> dict:
         """Extract relevant context for a specific query."""
@@ -66,22 +90,97 @@ Provide a detailed summary that will help with future questions:"""
     
     def process_question(self, question: str, document_ids: List[str] = None) -> Dict[str, Any]:
         """Process a question and return answer with context."""
-        # Simplified - no document storage
-        return {
-            "answer": "Document storage disabled - only GSTR-1 processing available",
-            "context": "No document storage enabled",
-            "question": question,
-            "sources": []
-        }
+        if not document_store["documents"]:
+            return {
+                "answer": "No documents available. Please upload documents first to ask questions about them.",
+                "sources": [],
+                "question": question
+            }
+        
+        # Gather context from all available documents
+        all_contexts = []
+        sources = []
+        
+        for filename in document_store["documents"].keys():
+            chunks = document_store["chunks"].get(filename, [])
+            if chunks:
+                relevant_chunks = self.find_relevant_chunks(question, chunks)
+                if relevant_chunks:
+                    context = "\n\n".join(relevant_chunks)
+                    all_contexts.append(f"From {filename}:\n{context}")
+                    sources.append(filename)
+        
+        if not all_contexts:
+            return {
+                "answer": "I couldn't find relevant information in your uploaded documents to answer this question. Try asking about GST filing procedures, invoice details, or document content.",
+                "sources": [],
+                "question": question
+            }
+        
+        combined_context = "\n\n---\n\n".join(all_contexts)
+        
+        # Generate final answer
+        prompt = f"""Answer this question based on the provided context from uploaded documents. Be specific and helpful.
+
+Question: {question}
+
+Context from uploaded documents:
+{combined_context}
+
+Instructions:
+- Provide a direct, helpful answer based on the document context
+- Include specific details from the documents when relevant
+- If the context doesn't fully answer the question, say what you can determine and suggest what additional information might be needed
+- Be concise but comprehensive
+
+Answer:"""
+        
+        try:
+            response = self.model.generate_content(prompt)
+            return {
+                "answer": response.text.strip(),
+                "sources": sources,
+                "question": question
+            }
+        except Exception as e:
+            return {
+                "answer": f"I encountered an error while processing your question: {str(e)}. Please try again.",
+                "sources": [],
+                "question": question
+            }
 
     def answer_question(self, question: str, contexts: list) -> str:
         """Generate answer based on document contexts."""
         return "Document storage disabled - only GSTR-1 processing available"
     
     def get_document_summary(self, document_id: str) -> dict:
-        """Get document summary - no storage available."""
+        """Get document summary from document store."""
+        if not document_store["documents"]:
+            return {
+                "summary": "No documents available",
+                "document_id": document_id,
+                "message": "Please upload documents first"
+            }
+        
+        # Find document by ID (simplified - using filename as ID)
+        for filename in document_store["documents"].keys():
+            if document_id in filename or filename in document_id:
+                summary = document_store["summaries"].get(filename)
+                if not summary:
+                    # Generate summary if not exists
+                    content = document_store["documents"][filename]
+                    summary_data = self.create_document_summary(content)
+                    document_store["summaries"][filename] = summary_data["summary"]
+                    summary = summary_data["summary"]
+                
+                return {
+                    "summary": summary,
+                    "document_id": document_id,
+                    "filename": filename
+                }
+        
         return {
-            "summary": "Document storage disabled",
+            "summary": "Document not found",
             "document_id": document_id,
-            "message": "No document storage enabled"
+            "message": "Document not found in uploaded files"
         }
