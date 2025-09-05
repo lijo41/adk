@@ -232,7 +232,7 @@ async def save_gstr1_to_database(extraction_result: Dict[str, Any], filtered_res
                         "total_invoices": extraction_result.get("total_invoices", 0),
                         "total_taxable_value": extraction_result.get("total_taxable_value", 0.0),
                         "total_tax": extraction_result.get("total_tax_amount", 0.0),
-                        "total_invoice_value": sum(inv.get("invoice_value", 0) for inv in extraction_result.get("invoices", []))
+                        "total_invoice_value": sum(inv.get("invoice_value", 0) for inv in (extraction_result.get("invoices") or []))
                     }
                 }
             }

@@ -42,6 +42,11 @@ async def get_latest_gstr1_return(
         extraction_result = json_data.get("extraction_result", {})
         invoices_data = extraction_result.get("invoices", [])
         
+        # Extract categorized data that frontend expects
+        b2b_data = extraction_result.get("b2b", [])
+        b2cl_data = extraction_result.get("b2cl", [])
+        b2cs_data = extraction_result.get("b2cs", [])
+        
         return {
             "filing_id": latest_return.id,
             "status": "completed",
@@ -54,10 +59,15 @@ async def get_latest_gstr1_return(
                     "gstr1_extraction": {
                         "status": "completed",
                         "total_invoices": int(latest_return.total_invoices or 0),
-                        "b2b_invoices": int(latest_return.total_invoices or 0),
+                        "b2b_invoices": extraction_result.get("b2b_invoices", 0),
+                        "b2cl_invoices": extraction_result.get("b2cl_invoices", 0),
+                        "b2cs_invoices": extraction_result.get("b2cs_invoices", 0),
                         "total_taxable_value": float(latest_return.total_taxable_value or 0),
                         "total_tax_amount": float(latest_return.total_tax or 0),
                         "invoices": invoices_data,
+                        "b2b": b2b_data,
+                        "b2cl": b2cl_data,
+                        "b2cs": b2cs_data,
                         "message": f"Successfully processed {int(latest_return.total_invoices or 0)} invoices"
                     }
                 }

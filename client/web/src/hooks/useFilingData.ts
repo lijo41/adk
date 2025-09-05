@@ -61,13 +61,20 @@ export const useFilingData = (reportId: string) => {
     console.log('Extraction result keys:', Object.keys(extractionResult));
     console.log('Extraction result:', JSON.stringify(extractionResult, null, 2));
     
-    // Use invoices array and categorize based on category field
-    const allInvoices = extractionResult.invoices || [];
+    // Use pre-categorized arrays from backend if available, otherwise filter by category
     const categorizedInvoices = {
-      b2b: allInvoices.filter((inv: any) => inv.category === 'B2B'),
-      b2cl: allInvoices.filter((inv: any) => inv.category === 'B2CL'),
-      b2cs: allInvoices.filter((inv: any) => inv.category === 'B2CS')
+      b2b: extractionResult.b2b || [],
+      b2cl: extractionResult.b2cl || [],
+      b2cs: extractionResult.b2cs || []
     };
+    
+    // Fallback: if no categorized arrays, try filtering by category field
+    if (categorizedInvoices.b2b.length === 0 && categorizedInvoices.b2cl.length === 0 && categorizedInvoices.b2cs.length === 0) {
+      const allInvoices = extractionResult.invoices || [];
+      categorizedInvoices.b2b = allInvoices.filter((inv: any) => inv.category === 'B2B');
+      categorizedInvoices.b2cl = allInvoices.filter((inv: any) => inv.category === 'B2CL');
+      categorizedInvoices.b2cs = allInvoices.filter((inv: any) => inv.category === 'B2CS');
+    }
 
     console.log('=== CATEGORIZED INVOICES ===');
     console.log('Database categorization:', {

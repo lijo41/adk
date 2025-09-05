@@ -18,8 +18,6 @@ const Dashboard: React.FC = () => {
         {/* Subtle gradient overlay for depth - same as login */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-blue-900/30"></div>
         <div className="absolute inset-0 bg-gradient-to-r from-blue-900/40 via-transparent to-slate-800/20"></div>
-        
-        
         <div className="relative z-10 flex items-center justify-between mr-25 h-full px-12 lg:px-16 py-48">
           <div className="w-full max-w-2xl ml-15">
             {/* Main heading */}
@@ -31,13 +29,11 @@ const Dashboard: React.FC = () => {
                   Powered by Finora
                 </span>
               </h2>
-              
               <p className="text-white/70 text-lg leading-relaxed font-normal max-w-xl">
                 Transform your GST compliance with AI-powered automation. Upload, process, and file with unprecedented ease.
               </p>
             </div>
-            
-            <button 
+            <button
               onClick={handleTryIt}
               className="px-8 py-4 text-lg font-semibold text-white bg-black rounded-lg transition-all duration-300 hover:bg-gray-900 hover:transform hover:scale-105 shadow-lg cursor-pointer"
             >
@@ -45,7 +41,7 @@ const Dashboard: React.FC = () => {
             </button>
           </div>
 
-          {/* Enhanced AI Robot Illustration   */}
+          {/* Enhanced AI Robot Illustration */}
           <div className="flex justify-center">
             <div className="relative">
               {/* Main Robot Container */}
@@ -56,14 +52,13 @@ const Dashboard: React.FC = () => {
                 }}></div>
                 <style dangerouslySetInnerHTML={{
                   __html: `
-                    @keyframes shine {
-                      0% { transform: translateX(-100%); }
-                      50% { transform: translateX(100%); }
-                      100% { transform: translateX(-100%); }
-                    }
-                  `
+@keyframes shine {
+0% { transform: translateX(-100%); }
+50% { transform: translateX(100%); }
+100% { transform: translateX(-100%); }
+}
+`
                 }} />
-                
                 {/* Robot Body */}
                 <div className="relative z-10">
                   <svg className="w-40 h-40 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -71,27 +66,23 @@ const Dashboard: React.FC = () => {
                   </svg>
                 </div>
               </div>
-              
               {/* Floating Feature Icons */}
-              <div className="absolute -top-6 -left-12 w-16 h-16 bg-black/40 backdrop-blur-sm rounded-xl flex items-center justify-center animate-bounce" style={{animationDelay: '0s', animationDuration: '3s'}}>
+              <div className="absolute -top-6 -left-12 w-16 h-16 bg-black/40 backdrop-blur-sm rounded-xl flex items-center justify-center animate-bounce" style={{ animationDelay: '0s', animationDuration: '3s' }}>
                 <svg className="w-8 h-8 text-blue-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
-              
-              <div className="absolute -top-6 -right-12 w-16 h-16 bg-black/40 backdrop-blur-sm rounded-xl flex items-center justify-center animate-bounce" style={{animationDelay: '1s', animationDuration: '3s'}}>
+              <div className="absolute -top-6 -right-12 w-16 h-16 bg-black/40 backdrop-blur-sm rounded-xl flex items-center justify-center animate-bounce" style={{ animationDelay: '1s', animationDuration: '3s' }}>
                 <svg className="w-8 h-8 text-blue-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
               </div>
-              
-              <div className="absolute -bottom-6 -left-12 w-16 h-16 bg-black/40 backdrop-blur-sm  rounded-xl flex items-center justify-center animate-bounce" style={{animationDelay: '2s', animationDuration: '3s'}}>
+              <div className="absolute -bottom-6 -left-12 w-16 h-16 bg-black/40 backdrop-blur-sm rounded-xl flex items-center justify-center animate-bounce" style={{ animationDelay: '2s', animationDuration: '3s' }}>
                 <svg className="w-8 h-8 text-blue-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
-              
-              <div className="absolute -bottom-6 -right-12 w-16 h-16 bg-black/40 backdrop-blur-sm rounded-xl flex items-center justify-center animate-bounce" style={{animationDelay: '0.5s', animationDuration: '3s'}}>
+              <div className="absolute -bottom-6 -right-12 w-16 h-16 bg-black/40 backdrop-blur-sm rounded-xl flex items-center justify-center animate-bounce" style={{ animationDelay: '0.5s', animationDuration: '3s' }}>
                 <svg className="w-8 h-8 text-blue-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                 </svg>
@@ -120,8 +111,8 @@ const Dashboard: React.FC = () => {
                   </div>
                   <h3 className="text-white font-medium text-xl">Document Processing</h3>
                 </div>
-                <p className="text-white/70 text-lg leading-relaxed font-normal   ">
-                  Our Smart AI automatically identifies and processes your GST documents. 
+                <p className="text-white/70 text-lg leading-relaxed font-normal ">
+                  Our Smart AI automatically identifies and processes your GST documents.
                   Upload invoices, receipts, and other documents for instant analysis.
                 </p>
               </div>
@@ -131,7 +122,6 @@ const Dashboard: React.FC = () => {
                   <div className="absolute inset-0 bg-gradient-to-r from-transparent via-blue-300/20 to-transparent animate-pulse" style={{
                     animation: 'shine 3s ease-in-out infinite'
                   }}></div>
-                  
                   {/* Document stack with blue theme */}
                   <div className="relative z-10">
                     <div className="absolute -rotate-12 w-12 h-16 bg-blue-400/40 backdrop-blur-sm rounded-sm border border-blue-300/50 shadow-lg"></div>
@@ -143,66 +133,146 @@ const Dashboard: React.FC = () => {
                       <div className="w-2/3 h-0.5 bg-blue-200/50 mt-1 rounded-full"></div>
                     </div>
                   </div>
-                  
                   {/* Animated upload indicator */}
                   <div className="absolute top-4 right-4">
                     <div className="w-3 h-3 bg-blue-400 rounded-full animate-ping"></div>
                   </div>
                 </div>
               </div>
-            </CardHeader>
-            <CardContent>
-              <Button variant="outline" className="w-full">
-                View Filing History
-              </Button>
-            </CardContent>
-          </Card>
+            </div>
 
-        </div>
-
-        {/* Recent Activity */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Recent Activity</CardTitle>
-            <CardDescription>
-              Your latest GST filing activities
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              <div className="flex items-center justify-between p-3 border rounded-lg">
-                <div className="flex items-center">
-                  <div className="w-2 h-2 bg-green-500 rounded-full mr-3"></div>
-                  <div>
-                    <div className="font-medium">GSTR1 - March 2024</div>
-                    <div className="text-sm text-muted-foreground">Filed successfully</div>
+            {/* Step 2: Data Extraction */}
+            <div className="flex items-center justify-between">
+              <div className="flex-1 flex justify-center">
+                <div className="w-64 h-48 bg-blue-500/10 backdrop-blur-sm border border-blue-400/30 rounded-lg flex items-center justify-center relative overflow-hidden">
+                  {/* Glassmorphism shine effect */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-blue-300/20 to-transparent" style={{
+                    animation: 'shine 4s ease-in-out infinite'
+                  }}></div>
+                  {/* Magnifying glass with data search */}
+                  <div className="relative z-10">
+                    {/* Magnifying glass */}
+                    <div className="relative mb-4">
+                      <div className="w-12 h-12 bg-blue-500/40 backdrop-blur-sm rounded-full border border-blue-400/50 shadow-lg flex items-center justify-center">
+                        <div className="w-8 h-8 bg-blue-400/60 backdrop-blur-sm rounded-full border border-blue-300/40"></div>
+                      </div>
+                      {/* Handle */}
+                      <div className="absolute -bottom-2 -right-2 w-6 h-1 bg-blue-500/60 backdrop-blur-sm rounded-full rotate-45 border border-blue-400/50"></div>
+                    </div>
+                    {/* Search results/data points */}
+                    <div className="flex space-x-2">
+                      <div className="w-2 h-2 bg-blue-400/70 backdrop-blur-sm rounded-full animate-pulse border border-blue-300/30"></div>
+                      <div className="w-2 h-2 bg-blue-500/60 backdrop-blur-sm rounded-full animate-pulse border border-blue-400/30" style={{ animationDelay: '0.3s' }}></div>
+                      <div className="w-2 h-2 bg-blue-600/80 backdrop-blur-sm rounded-full animate-pulse border border-blue-500/30" style={{ animationDelay: '0.6s' }}></div>
+                      <div className="w-2 h-2 bg-blue-400/70 backdrop-blur-sm rounded-full animate-pulse border border-blue-300/30" style={{ animationDelay: '0.9s' }}></div>
+                    </div>
+                  </div>
+                  {/* Processing indicator */}
+                  <div className="absolute bottom-4 right-4">
+                    <div className="w-3 h-3 bg-blue-400 rounded-full animate-ping"></div>
                   </div>
                 </div>
-                <div className="text-sm text-green-600 font-medium">Completed</div>
               </div>
-              
-              <div className="flex items-center justify-between p-3 border rounded-lg">
-                <div className="flex items-center">
-                  <div className="w-2 h-2 bg-yellow-500 rounded-full mr-3"></div>
-                  <div>
-                    <div className="font-medium">GSTR2 - March 2024</div>
-                    <div className="text-sm text-muted-foreground">Processing documents</div>
+              <div className="flex-1 pl-12">
+                <div className="flex items-center mb-4">
+                  <div className="w-10 h-10 bg-gray-800 text-white rounded-lg flex items-center justify-center font-bold mr-4 text-base">
+                    2
                   </div>
+                  <h3 className="text-white font-medium text-xl">Data Extraction</h3>
                 </div>
-                <div className="text-sm text-yellow-600 font-medium">In Progress</div>
-              </div>
-              
-              <div className="text-center py-4 text-muted-foreground">
-                <Button variant="ghost" onClick={() => navigate('/filing/upload')}>
-                  Start your first filing →
-                </Button>
+                <p className="text-white/70 text-lg leading-relaxed font-normal">
+                  Extract critical data fields such as vendor names, amounts, tax rates,
+                  invoice numbers, and more in seconds. Adjust, edit, and filter all outputs with ease.
+                </p>
               </div>
             </div>
-          </CardContent>
-        </Card>
+
+            {/* Step 3: GST Filing */}
+            <div className="flex items-center justify-between">
+              <div className="flex-1 pr-12">
+                <div className="flex items-center mb-4">
+                  <div className="w-10 h-10 bg-gray-800 text-white rounded-lg flex items-center justify-center font-bold mr-4 text-base">
+                    3
+                  </div>
+                  <h3 className="text-white font-medium text-xl">GSTR-1 Filing Automation</h3>
+                </div>
+                <p className="text-white/70 text-lg leading-relaxed font-normal">
+                  Easily generate GSTR-1 returns with automated data processing.
+                  Export to Excel, integrate with accounting software, or file directly through our platform.
+                </p>
+              </div>
+              <div className="flex-1 flex justify-center">
+                <div className="w-64 h-48 bg-blue-500/10 backdrop-blur-sm border border-blue-400/30 rounded-lg flex items-center justify-center relative overflow-hidden">
+                  {/* Glassmorphism shine effect */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-blue-300/20 to-transparent" style={{
+                    animation: 'shine 5s ease-in-out infinite'
+                  }}></div>
+                  {/* Excel sheet visualization */}
+                  <div className="relative z-10">
+                    {/* Excel sheet container */}
+                    <div className="w-20 h-16 bg-white/90 backdrop-blur-sm rounded-sm border border-blue-400/50 shadow-lg relative mb-2">
+                      {/* Excel header row (blue) */}
+                      <div className="absolute top-0 left-0 right-0 h-3 bg-blue-600/80 backdrop-blur-sm border-b border-blue-700/50">
+                        <div className="grid grid-cols-5 h-full gap-px px-1">
+                          <div className="bg-blue-500/60 text-xs flex items-center justify-center text-white font-bold">A</div>
+                          <div className="bg-blue-500/60 text-xs flex items-center justify-center text-white font-bold">B</div>
+                          <div className="bg-blue-500/60 text-xs flex items-center justify-center text-white font-bold">C</div>
+                          <div className="bg-blue-500/60 text-xs flex items-center justify-center text-white font-bold">D</div>
+                          <div className="bg-blue-500/60 text-xs flex items-center justify-center text-white font-bold">E</div>
+                        </div>
+                      </div>
+                      {/* Excel data rows */}
+                      <div className="absolute top-3 left-0 right-0 bottom-0 grid grid-rows-4 gap-px p-1">
+                        <div className="grid grid-cols-5 gap-px">
+                          <div className="bg-blue-100/80 backdrop-blur-sm animate-pulse border border-gray-300/30"></div>
+                          <div className="bg-blue-200/70 backdrop-blur-sm animate-pulse border border-gray-300/30" style={{ animationDelay: '0.1s' }}></div>
+                          <div className="bg-blue-100/80 backdrop-blur-sm animate-pulse border border-gray-300/30" style={{ animationDelay: '0.2s' }}></div>
+                          <div className="bg-blue-200/70 backdrop-blur-sm animate-pulse border border-gray-300/30" style={{ animationDelay: '0.3s' }}></div>
+                          <div className="bg-blue-100/80 backdrop-blur-sm animate-pulse border border-gray-300/30" style={{ animationDelay: '0.4s' }}></div>
+                        </div>
+                        <div className="grid grid-cols-5 gap-px">
+                          <div className="bg-blue-200/70 backdrop-blur-sm animate-pulse border border-gray-300/30" style={{ animationDelay: '0.5s' }}></div>
+                          <div className="bg-blue-100/80 backdrop-blur-sm animate-pulse border border-gray-300/30" style={{ animationDelay: '0.6s' }}></div>
+                          <div className="bg-blue-200/70 backdrop-blur-sm animate-pulse border border-gray-300/30" style={{ animationDelay: '0.7s' }}></div>
+                          <div className="bg-blue-100/80 backdrop-blur-sm animate-pulse border border-gray-300/30" style={{ animationDelay: '0.8s' }}></div>
+                          <div className="bg-blue-200/70 backdrop-blur-sm animate-pulse border border-gray-300/30" style={{ animationDelay: '0.9s' }}></div>
+                        </div>
+                        <div className="grid grid-cols-5 gap-px">
+                          <div className="bg-blue-100/80 backdrop-blur-sm animate-pulse border border-gray-300/30" style={{ animationDelay: '1s' }}></div>
+                          <div className="bg-blue-200/70 backdrop-blur-sm animate-pulse border border-gray-300/30" style={{ animationDelay: '1.1s' }}></div>
+                          <div className="bg-blue-100/80 backdrop-blur-sm animate-pulse border border-gray-300/30" style={{ animationDelay: '1.2s' }}></div>
+                          <div className="bg-blue-200/70 backdrop-blur-sm animate-pulse border border-gray-300/30" style={{ animationDelay: '1.3s' }}></div>
+                          <div className="bg-blue-100/80 backdrop-blur-sm animate-pulse border border-gray-300/30" style={{ animationDelay: '1.4s' }}></div>
+                        </div>
+                        <div className="grid grid-cols-5 gap-px">
+                          <div className="bg-blue-200/70 backdrop-blur-sm animate-pulse border border-gray-300/30" style={{ animationDelay: '1.5s' }}></div>
+                          <div className="bg-blue-100/80 backdrop-blur-sm animate-pulse border border-gray-300/30" style={{ animationDelay: '1.6s' }}></div>
+                          <div className="bg-blue-200/70 backdrop-blur-sm animate-pulse border border-gray-300/30" style={{ animationDelay: '1.7s' }}></div>
+                          <div className="bg-blue-100/80 backdrop-blur-sm animate-pulse border border-gray-300/30" style={{ animationDelay: '1.8s' }}></div>
+                          <div className="bg-blue-200/70 backdrop-blur-sm animate-pulse border border-gray-300/30" style={{ animationDelay: '1.9s' }}></div>
+                        </div>
+                      </div>
+                    </div>
+                    {/* Excel icon */}
+                    <div className="flex justify-center">
+                      <div className="w-4 h-4 bg-blue-600/80 backdrop-blur-sm rounded-sm flex items-center justify-center">
+                        <div className="text-xs text-white font-bold">X</div>
+                      </div>
+                    </div>
+                  </div>
+                  {/* Success indicator */}
+                  <div className="absolute bottom-4 right-4">
+                    <div className="w-3 h-3 bg-blue-400 rounded-full animate-ping"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
 };
 
 export default Dashboard;
+
